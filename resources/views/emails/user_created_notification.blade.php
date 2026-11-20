@@ -94,7 +94,7 @@
                         <td style="border: 1px solid #ddd; padding: 8px;">Quratul Ain Adnan</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Assistant Manager HR Operations</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">South</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">quratulain.adnan@guest.jazz.com.pk</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">quratulain.adnan@hrpsp.net</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">03171071144</td>
                     </tr>
                     <tr>
@@ -102,25 +102,25 @@
                         <td style="border: 1px solid #ddd; padding: 8px;">Muzaffar Mehmood</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Assistant Manager HR Operations</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Central A</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">muzaffar@hrpsp.net</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">muzaffar.mehmood@hrpsp.net</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">03077008088</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">3</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Mubashir Hassan</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">Senior Executive HR</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Central B</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">mubashir.hassan1@guest.jazz.com.pk</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Central B, Central C</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">mubashir.hassan@hrpsp.net</td>
                   
                         <td style="border: 1px solid #ddd; padding: 8px;">03167650007</td>
                     </tr>
                     <tr>
                         <td style="border: 1px solid #ddd; padding: 8px;">4</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Sara Habib</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Senior Executive HR</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Abdullah Babar</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">Executive HR</td>
                         <td style="border: 1px solid #ddd; padding: 8px;">North, North West</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">sara.habib@guest.jazz.com.pk</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">03015656666</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">abdullah.babar@hrpsp.net</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">03219905112</td>
                     </tr>
                 </tbody>
             </table>
