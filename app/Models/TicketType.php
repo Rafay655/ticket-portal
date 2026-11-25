@@ -9,18 +9,16 @@ class TicketType extends Model
 {
     use HasFactory;
 
-    protected $fillable = [ 
-        'name',
-    ];
- 
-    
-         public function subTypes()
+    protected $fillable = ['name'];
+
+    public function categories()
     {
-        return $this->belongsToMany(
-            TicketSubType::class,     // related model
-            'ticket_settings',        // pivot table
-            'ticket_type_id',         // this model's key on pivot
-            'ticket_sub_type_id'      // related model's key on pivot
-        )->withTimestamps();
+        return $this->hasMany(TicketCategory::class, 'ticket_type_id');
+    }
+
+    public function subTypes()
+    {
+        // Retain the existing method/API name, now following the three-level hierarchy.
+        return $this->hasManyThrough(TicketSubType::class, TicketCategory::class, 'ticket_type_id', 'ticket_category_id');
     }
 }

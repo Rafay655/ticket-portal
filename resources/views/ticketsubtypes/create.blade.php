@@ -7,9 +7,9 @@
           <i class="ni ni-box-2"></i>
         </a>
       </li>
-      <li class="breadcrumb-item text-sm text-white active"><a class="opacity-5 text-white" href="javascript:;">Create Ticket Sub Type</a></li>
+      <li class="breadcrumb-item text-sm text-white active"><a class="opacity-5 text-white" href="javascript:;">Create Ticket Sub-Category</a></li>
     </ol>
-    <h6 class="font-weight-bolder mb-0 text-white">Create New Ticket Sub Type</h6>
+    <h6 class="font-weight-bolder mb-0 text-white">Create New Ticket Sub-Category</h6>
   </nav>
 @endsection
 
@@ -22,11 +22,16 @@
         <div class="col-12">
           <div class="card">
             <div class="card-body">
+                @include('tickets.partials.hierarchy-fields', [
+                    'typeField' => 'ticket_type_id', 'includeSubCategory' => false,
+                    'selectedType' => $ticketsubtype->category->ticket_type_id ?? null,
+                    'selectedCategory' => $ticketsubtype->ticket_category_id ?? null,
+                ])
               <div class="row">
 
                   <div class="form-group col-md-3 @error('name') is-invalid @enderror">
                     <label for="name">Name</label>
-                    <input type="text" name="name" class="form-control" id="name" placeholder="Ticket Sub Type Name">
+                    <input type="text" name="name" class="form-control" id="name" value="{{ old('name', $ticketsubtype->name ?? '') }}" placeholder="Ticket Sub-Category Name" maxlength="255" required>
                     @error('name')
                         <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
@@ -36,7 +41,7 @@
                     <label for="priority" class="form-control-label">Priority</label>
                   <select class="form-control" name="priority" id="priority" >
                       @foreach($priorities as $priority)
-                        <option value="{{$priority->priority}}">{{$priority->priority}}</option>
+                        <option {{ old('priority', $ticketsubtype->priority ?? '') == $priority->priority ? "selected" : "" }} value="{{$priority->priority}}">{{$priority->priority}}</option>
                       @endforeach
                     </select>
                   </div>

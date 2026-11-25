@@ -47,11 +47,11 @@
             style="border-bottom:1px solid #ddd; gap:1rem;">
         <input type="hidden" name="tab" value="{{ request('tab','my-tickets') }}">
 
-        
+
         <div style="min-width:150px;">
           <select name="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
             @foreach(['5','10','20','50','all'] as $opt)
-              <option value="{{ $opt }}" {{ request('perpage')==$opt ? 'selected':'' }}>
+              <option value="{{ $opt }}" {{ request('perpage', '10')==$opt ? 'selected':'' }}>
                 {{ $opt==='all' ? 'All' : $opt }}
               </option>
             @endforeach
@@ -81,10 +81,11 @@
           <input type="text"
                  name="search"
                  value="{{ request('search') }}"
-                 placeholder="Type, Subtype, User, Status..."
+                 placeholder="ID, Description, Category, User, Status..."
                  class="form-control form-control-sm me-2"
                  onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
           <button type="submit" class="btn btn-sm btn-primary">Search</button>
+          <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary ms-2">Reset</a>
         </div>
       </form>
 
@@ -107,12 +108,13 @@
         <div class="tab-pane fade {{ $activeTab==='my-tickets' ? 'show active':'' }}"
              id="my-tickets" role="tabpanel">
           <div class="table-responsive p-3">
-            <table class="table table-striped" id="my-tickets-table">
+            <table data-serial-offset="{{ max(0, ($tickets->firstItem() ?? 1) - 1) }}" class="table table-striped" id="my-tickets-table">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th data-serial-column>Sr#</th>
                   <th>Ticket Type</th>
-                  <th>Ticket Subtype</th>
+                  <th>Ticket Category</th>
+                  <th>Ticket Sub-Category</th>
                   <th>Comments</th>
                   <th>Requested By</th>
                   <th>Assign To</th>
@@ -127,6 +129,7 @@
                 <tr>
                   <td>{{ $tickets->firstItem() + $loop->index }}</td>
                   <td>{{ $ticket->tickettype->name }}</td>
+                  <td>{{ $ticket->ticket_category_name ?? 'Not assigned' }}</td>
                   <td>{{ $ticket->ticketsubtype->name ?? 'N/A' }}</td>
                   <td>{{ $ticket->comments->count() }}</td>
                   <td>{{ $ticket->requestedby->name }}</td>
@@ -157,7 +160,7 @@
           </div>
           <div class="d-flex justify-content-between align-items-center px-4 py-3">
             {{ $tickets
-                ->appends(['tab'=>'my-tickets','perpage'=>request('perpage'),'search'=>request('search')])
+                ->appends(['tab'=>'my-tickets','perpage'=>request('perpage', '10'),'search'=>request('search')])
                 ->links('pagination::bootstrap-4') }}
           </div>
         </div>
@@ -169,12 +172,13 @@
             <p class="text-sm px-3 pt-3 mb-0">No team tickets found.</p>
           @endif
           <div class="table-responsive p-3">
-            <table class="table table-striped" id="team-tickets-table">
+            <table data-serial-offset="{{ max(0, ($team->firstItem() ?? 1) - 1) }}" class="table table-striped" id="team-tickets-table">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th data-serial-column>Sr#</th>
                   <th>Ticket Type</th>
-                  <th>Ticket Subtype</th>
+                  <th>Ticket Category</th>
+                  <th>Ticket Sub-Category</th>
                   <th>Comments</th>
                   <th>Requested By</th>
                   <th>Assign To</th>
@@ -189,6 +193,7 @@
                 <tr>
                   <td>{{ $team->firstItem() + $loop->index }}</td>
                   <td>{{ $ticket->tickettype->name }}</td>
+                  <td>{{ $ticket->ticket_category_name ?? 'Not assigned' }}</td>
                   <td>{{ $ticket->ticketsubtype->name ?? 'N/A' }}</td>
                   <td>{{ $ticket->comments->count() }}</td>
                   <td>{{ $ticket->requestedby->name }}</td>
@@ -219,7 +224,7 @@
           </div>
           <div class="d-flex justify-content-between align-items-center px-4 py-3">
             {{ $team
-                ->appends(['tab'=>'team-tickets','perpage'=>request('perpage'),'search'=>request('search')])
+                ->appends(['tab'=>'team-tickets','perpage'=>request('perpage', '10'),'search'=>request('search')])
                 ->links('pagination::bootstrap-4') }}
           </div>
         </div>
@@ -234,6 +239,9 @@
 <script>
   $(function(){
     $('#my-tickets-table, #team-tickets-table').DataTable({
+      serverSide: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging:   false,
       ordering: true,
       info:     false,

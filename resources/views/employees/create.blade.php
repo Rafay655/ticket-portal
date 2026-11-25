@@ -205,8 +205,6 @@
 
 
 @section('script')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
     // ───── INITIALIZE TOM SELECT ON REGION & SUB-REGION ─────
@@ -430,28 +428,5 @@
 });
 
   </script>
-  <script>
-   // If there's a "failed" message in the session, show Toastify
-   @if(session('failed'))
-       Toastify({
-         text: "{{ session('failed') }}",
-         duration: 3000,
-         gravity: "top",
-         position: "right",
-         backgroundColor: "#f5365c", // or any color
-         close: true
-       }).showToast();
-   @endif
-   // If there's a "success" message in the session, show Toastify
-   @if(session('success'))
-       Toastify({
-         text: "{{ session('success') }}",
-         duration: 3000,
-         gravity: "top",
-         position: "right",
-         backgroundColor: "#2dce89", // or any color
-         close: true
-       }).showToast();
-   @endif
- </script>
+
 @endsection

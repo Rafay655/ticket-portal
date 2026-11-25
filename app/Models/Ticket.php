@@ -12,6 +12,7 @@ class Ticket extends Model
 
     protected $fillable = [
         'tickettype_id',
+        'ticket_category_id',
         'ticketsubtype_id',
         'description',
         'ticket_attachment',
@@ -23,6 +24,22 @@ class Ticket extends Model
         'escalation_time_start'
 
     ];
+
+    protected $appends = ['ticket_category_name'];
+
+    public function ticketCategory()
+    {
+        return $this->belongsTo(TicketCategory::class, 'ticket_category_id');
+    }
+
+    public function getTicketCategoryNameAttribute(): ?string
+    {
+        if ($this->ticketCategory) return $this->ticketCategory->name;
+        // Old tickets retain their original IDs. Show a mapping only when its type matches.
+        $subCategory = $this->relations['ticketsubtype'] ?? $this->relations['ticketSubType'] ?? $this->ticketsubtype;
+        $category = $subCategory?->category;
+        return $category && (int) $category->ticket_type_id === (int) $this->tickettype_id ? $category->name : null;
+    }
 
     public static function getRouteName()
     {
@@ -63,193 +80,25 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketFeedback::class, 'ticket_id');
     }
-    public function shouldEscalate()
+    public function shouldEscalate(): bool
     {
-        $now = Carbon::now();
-
-
-        $escalation_time_start = $this->escalation_time_start;
-        $minutesSinceCreated = $this->getMinutesSinceCreatedDuringBusinessHours($escalation_time_start);
-
-        $subticketPriority = $this->ticketsubtype->priority;
-
-        $slaPolicy = SlaPolicy::first();
-
-        if ($slaPolicy) {
-            switch ($subticketPriority) {
-                case 'Urgent':
-                    $resolutionTime = $slaPolicy->urgent_resolution_time;
-                    break;
-                case 'High':
-                    $resolutionTime = $slaPolicy->high_resolution_time;
-                    break;
-                case 'Medium':
-                    $resolutionTime = $slaPolicy->medium_resolution_time;
-                    break;
-                case 'Low':
-                    $resolutionTime = $slaPolicy->low_resolution_time;
-                    break;
-                default:
-                    $resolutionTime = null;
-            }
-
-
-            if ($minutesSinceCreated >= $resolutionTime) {
-                return true;
-            } else {
-                return false;
-
-            }
-        }
-
-
+        return app(\App\Services\TicketResponseSla::class)->shouldEscalate($this);
     }
 
-    public function getMinutesSinceCreatedDuringBusinessHours($createdAt)
+    public function getMinutesSinceCreatedDuringBusinessHours($createdAt): int
     {
-        $totalWorkingMinutes = 0;
-        if (is_string($createdAt)) {
-            $createdAt = Carbon::parse($createdAt);
-        }
-        $now = Carbon::now();
-
-        $businessHours = BusinessHours::find(2);
-        $workingDays = $businessHours->getWorkingDays();
-
-        $currentDate = $createdAt->copy();
-
-        while ($currentDate->lessThanOrEqualTo($now)) {
-            $currentDay = strtolower($currentDate->format('l'));
-
-            if (in_array($currentDay, $workingDays)) {
-                $dayTimes = $businessHours->getStartEndTimesForDay($currentDay);
-                $businessStartTime = Carbon::parse($dayTimes['start'])->setDate($currentDate->year, $currentDate->month, $currentDate->day);
-                $businessEndTime = Carbon::parse($dayTimes['end'])->setDate($currentDate->year, $currentDate->month, $currentDate->day);
-
-                if ($currentDate->isSameDay($createdAt)) {
-                    if ($createdAt->between($businessStartTime, $businessEndTime)) {
-                        $startTime = $createdAt;
-                    } elseif ($createdAt->lessThan($businessStartTime)) {
-                        $startTime = $businessStartTime;
-                    } else {
-                        $currentDate->addDay()->startOfDay();
-                        continue;
-                    }
-                } else {
-                    $startTime = $businessStartTime;
-                }
-
-                if ($currentDate->isSameDay($now)) {
-                    $endTime = $now->lessThan($businessEndTime) ? $now : $businessEndTime;
-                } else {
-                    $endTime = $businessEndTime;
-                }
-
-                if ($startTime->lessThan($endTime)) {
-                    $totalWorkingMinutes += $startTime->diffInMinutes($endTime);
-                }
-            }
-
-            $currentDate->addDay()->startOfDay();
-        }
-
-        return $totalWorkingMinutes;
+        $calendar = app(\App\Services\TicketResponseSla::class)->calendar();
+        return $calendar ? app(\App\Services\BusinessHoursClock::class)->elapsedMinutes($calendar, $createdAt) : 0;
     }
+
     public function calculateDueDate()
     {
-        $now = Carbon::now();
-
-        // Get the SLA policy for resolution times based on priority
-        $subticketPriority = $this->ticketsubtype->priority;
-        $slaPolicy = SlaPolicy::first();
-
-        if (!$slaPolicy) {
-            return null; // Return null if no SLA policy is found
-        }
-
-        switch ($subticketPriority) {
-            case 'Urgent':
-                $resolutionTime = $slaPolicy->urgent_resolution_time;
-                break;
-            case 'High':
-                $resolutionTime = $slaPolicy->high_resolution_time;
-                break;
-            case 'Medium':
-                $resolutionTime = $slaPolicy->medium_resolution_time;
-                break;
-            case 'Low':
-                $resolutionTime = $slaPolicy->low_resolution_time;
-                break;
-            default:
-                $resolutionTime = null;
-        }
-
-        if ($resolutionTime === null) {
-            return null; // Return null if no resolution time is available for the priority
-        }
-
-        // Convert resolution time (in hours) into minutes
-        $requiredMinutes = $resolutionTime ;
-
-        // Calculate due date during business hours
-        $dueDate = $this->calculateDueDateDuringBusinessHours($this->created_at, $requiredMinutes);
-
-        return $dueDate;
+        return app(\App\Services\TicketResponseSla::class)->dueAt($this);
     }
 
     public function calculateDueDateDuringBusinessHours($createdAt, $requiredMinutes)
     {
-        if (is_string($createdAt)) {
-            $createdAt = Carbon::parse($createdAt);
-        }
-
-        $businessHours = BusinessHours::find(2); // Assuming business hours are stored in the BusinessHours model
-        $workingDays = $businessHours->getWorkingDays(); // Get array of working days (e.g., ['monday', 'tuesday', ...])
-
-        $currentDate = $createdAt->copy();
-        $remainingMinutes = $requiredMinutes;
-
-        while ($remainingMinutes > 0) {
-            $currentDay = strtolower($currentDate->format('l')); // Get the current day of the week in lowercase
-
-            // Check if the current day is a working day
-            if (in_array($currentDay, $workingDays)) {
-                $dayTimes = $businessHours->getStartEndTimesForDay($currentDay);
-                $businessStartTime = Carbon::parse($dayTimes['start'])->setDate($currentDate->year, $currentDate->month, $currentDate->day);
-                $businessEndTime = Carbon::parse($dayTimes['end'])->setDate($currentDate->year, $currentDate->month, $currentDate->day);
-
-                // Calculate working minutes for the current day
-                if ($currentDate->isSameDay($createdAt)) {
-                    // If it's the same day as ticket creation, start from the created time
-                    $startTime = $createdAt->greaterThan($businessStartTime) ? $createdAt : $businessStartTime;
-                } else {
-                    $startTime = $businessStartTime;
-                }
-
-                // Calculate end time for today (if it's today, compare with the current time)
-                $endTime = $currentDate->isToday() ? Carbon::now()->min($businessEndTime) : $businessEndTime;
-
-                // Calculate the difference in minutes
-                $workingMinutes = $startTime->diffInMinutes($endTime, false); // False ensures that negative values aren't returned
-
-                if ($workingMinutes > 0) {
-                    if ($workingMinutes >= $remainingMinutes) {
-                        // If remaining minutes can be covered in the current day
-                        return $startTime->addMinutes($remainingMinutes); // Return the due date
-                    } else {
-                        // Subtract the minutes worked today and move to the next day
-                        $remainingMinutes -= $workingMinutes;
-                    }
-                }
-            }
-
-            // Move to the next day and reset time to start of day
-            $currentDate->addDay()->startOfDay();
-        }
-
-        return $currentDate; // This will be the calculated due date
+        $calendar = app(\App\Services\TicketResponseSla::class)->calendar();
+        return $calendar ? app(\App\Services\BusinessHoursClock::class)->addMinutes($calendar, $createdAt, (int) $requiredMinutes) : null;
     }
-
-
-
 }

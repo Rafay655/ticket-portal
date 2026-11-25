@@ -16,15 +16,12 @@ class DepartmentController extends Controller
     public function index(Request $request)
     {
         RolesPermissionController::can(['department.index']);
-        $perPage = $request->input('perpage', 10); // Default to 10 items per page
-        
-        // Fetch paginated departments
-        $departments = Department::paginate($perPage)->appends(['perpage' => $perPage]);
-    
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $departments = \App\Support\ListingFilters::paginate(Department::query(), $request, ['name']);
         return view('departments.index', compact('departments', 'perPage'));
     }
-    
-    
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -45,7 +42,7 @@ class DepartmentController extends Controller
         Department::create($input);
         return redirect()->route('departments.index')->with('success', 'Create successfully!');
     }
-    
+
     /**
      * Display the specified resource.
      */
@@ -64,7 +61,7 @@ class DepartmentController extends Controller
         $data['department'] = $department;
         return view('departments.edit',$data);
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -76,7 +73,7 @@ class DepartmentController extends Controller
         $department->save();
         return redirect()->route('departments.index')->with('success', 'Update successfully!');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */

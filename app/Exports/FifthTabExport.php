@@ -17,15 +17,16 @@ class FifthTabExport implements FromArray
     {
         $data = [];
         // Define the headers for the first sheet
-        $data[] = ['Sr #', 'Ticket Type', 'Ticket Subtype', 'Rating'];
+        $data[] = ['Sr #', 'Ticket Type', 'Ticket Category', 'Ticket Sub-Category', 'Rating'];
         ;
 
         // Add data rows for the first tab
-        $count = 0;
+        $count = 1;
         foreach ($this->data as $ticket) {
             $data[] = [
                 $count,
                 $ticket->tickettype->name,
+                $ticket->ticket_category_name ?? 'Not assigned',
                 $ticket->ticketsubtype->name,
                 $ticket->rate,
                

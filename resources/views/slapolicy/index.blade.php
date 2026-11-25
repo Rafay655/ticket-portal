@@ -26,11 +26,11 @@
             <h5 class="mb-0">SLA Policies</h5>
             <p class="text-sm mb-0">
               Service Level Agreement (SLA) policies help you setup and maintain targets for the duration within which
-              your teams respond and resolve tickets.
+              your teams first respond to tickets.
             </p>
             <br>
             <div class="info">
-              <div>ℹ️ The first matching SLA policy will be applied to tickets with matching conditions</div>
+              <div>ℹ️ The first saved SLA policy controls Open-ticket first-response escalation by priority.</div>
             </div>
           </div>
           <div class="ms-auto d-flex  my-auto mt-lg-0 mt-4">

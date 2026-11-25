@@ -30,11 +30,9 @@ class UserController extends Controller
     public function index(Request $request, $channel = "web")
     {
         RolesPermissionController::can(['user.index']);
-        $perPage = $request->input('perpage', 10); // Default to 10 items per page if not specified
-        $data = [];
-        $data['users'] = User::where('user_type', 'user')->paginate($perPage)->appends(['perpage' => $perPage]); // Append 'perpage' to pagination links
-        $data['perPage'] = $perPage; // Pass the current per-page value to the view
-        return view('users.index', $data);
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $users = \App\Support\ListingFilters::paginate(User::where('user_type', 'user')->with('roles'), $request, ['user_id', 'name', 'email'], ['roles' => ['name']]);
+        return view('users.index', compact('users', 'perPage'));
     }
 
 
@@ -94,10 +92,10 @@ class UserController extends Controller
     public function userSeparationIndex(Request $request)
     {
         RolesPermissionController::can(['admindashboard.index']);
-        $perPage = $request->get('perpage', 10);
+        $perPage = \App\Support\ListingFilters::perPage($request);
 
         // Fetch separated users with pagination
-        $userSeparations = \App\Models\UserSeparation::paginate($perPage);
+        $userSeparations = \App\Support\ListingFilters::paginate(\App\Models\UserSeparation::query(), $request, ['id', 'name', 'email', 'separation_date']);
 
         return view('users.user_separation', compact('userSeparations', 'perPage'));
     }

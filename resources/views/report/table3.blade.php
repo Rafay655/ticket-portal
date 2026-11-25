@@ -2,7 +2,8 @@
     <tr>
         <th>ID</th>
         <th>Ticket Type</th>
-        <th>Ticket Subtype</th>
+        <th>Ticket Category</th>
+        <th>Ticket Sub-Category</th>
         <th>Happiness Rating</th>
     </tr>
     @php
@@ -14,6 +15,7 @@
         <tr>
             <td>{{ $ticket->id }}</td>
             <td>{{ $ticket->tickettype->name }}</td>
+            <td>{{ $ticket->ticket_category_name ?? 'Not assigned' }}</td>
             <td>{{ $ticket->ticketsubtype->name }}</td>
             <td style="font-family:sans-serif">
                 @for ($i = 1; $i <= 5; $i++)

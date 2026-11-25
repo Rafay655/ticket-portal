@@ -17,15 +17,18 @@ class RolesPermissionController extends Controller
         self::can(['role.index']);
 
         // Fetch the 'perpage' parameter or use the default value of 10
-        $perPage = $request->input('perpage', 10);
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $query = Role::query();
+        if (!auth()->user()->hasRole('superAdmin', 'web')) $query->whereNotIn('name', ['superAdmin', 'admin']);
+        $roles = \App\Support\ListingFilters::paginate($query, $request, ['name']);
 
         // Check if the request is AJAX (for DataTables integration)
         if ($request->ajax()) {
             // Paginate the roles based on the perPage value
-            $roles = Role::paginate($perPage);
+
 
             $data = [];
-            $i = ($roles->currentPage() - 1) * $perPage; // Calculate serial numbers
+            $i = ($roles->firstItem() ?? 1) - 1; // Calculate serial numbers
 
             foreach ($roles as $role) {
                 $i++;
@@ -43,7 +46,7 @@ class RolesPermissionController extends Controller
         }
 
         // Render the view for normal requests
-        $roles = Role::paginate($perPage)->appends(['perpage' => $perPage]);
+
         return view('roles.index', compact('roles', 'perPage'));
     }
 
@@ -120,9 +123,9 @@ class RolesPermissionController extends Controller
         if (!auth()->check()) {
             return abort(401, 'You are not authorized to perform this action');
         }
-    
+
         if ($permission1 != null) {
-            
+
             $permission = auth()->user()->can($permission1);
             if (!$permission) {
                 return abort(401, 'You are not authorized to perform this action');
@@ -136,7 +139,7 @@ class RolesPermissionController extends Controller
         if (!auth()->check()) {
             return redirect('/login');
         }
-    
+
         if($permission1){
 
             $permission = auth()->user()->canany($permission1);
@@ -232,7 +235,8 @@ class RolesPermissionController extends Controller
             ['name' => 'Business Hours', 'slug' => 'businesshours'],
             ['name' => 'SLA Policies', 'slug' => 'slapolicies'],
             ['name' => 'Ticket Type', 'slug' => 'ticketType'],
-            ['name' => 'Ticket SubType', 'slug' => 'ticketSubType'],
+            ['name' => 'Ticket Category', 'slug' => 'ticketCategory'],
+            ['name' => 'Ticket Sub-Category', 'slug' => 'ticketSubType'],
             ['name' => 'Ticket Settings', 'slug' => 'ticketSettings'],
             ['name' => 'Designation', 'slug' => 'designation'],
             ['name' => 'Department', 'slug' => 'department'],

@@ -99,7 +99,7 @@
                     </a>
                 </li>
             @endcan
-            @canany(['businesshours.index', 'slapolicies.edit', 'designation.index', 'department.index', 'region.index', 'grade.index', 'ticketType.index', 'ticketSubType.index', 'ticketSettings.index',"admindashboard.index"])
+            @canany(['businesshours.index', 'slapolicies.edit', 'designation.index', 'department.index', 'region.index', 'grade.index', 'ticketType.index', 'ticketCategory.index', 'ticketSubType.index', 'ticketSettings.index',"admindashboard.index"])
 
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('adminpanel') ? 'active' : '' }}" data-bs-toggle="collapse"
@@ -152,7 +152,7 @@
                 </a>
 
 
-                <div class="collapse" id="employeeSettings" style="">
+                <div class="collapse {{ request()->is('tickettypes*', 'ticketcategories*', 'ticketsubtypes*', 'ticketsetting*') ? 'show' : '' }}" id="employeeSettings" style="">
                     <ul class="nav ms-4">
                         @can(['businesshours.index'])
                             <li class="nav-item">
@@ -228,29 +228,37 @@
                             </div>
                         </li>
                         @endcan
-                        @canany(['ticketType.index', 'ticketSubType.index', 'ticketSettings.index'])
+                        @canany(['ticketType.index', 'ticketCategory.index', 'ticketSubType.index', 'ticketSettings.index'])
                         <li class="nav-item  ">
-                            <a class="nav-link collapsed " data-bs-toggle="collapse" aria-expanded="false"
+                            <a class="nav-link {{ request()->is('tickettypes*', 'ticketcategories*', 'ticketsubtypes*', 'ticketsetting*') ? '' : 'collapsed' }}" data-bs-toggle="collapse" aria-expanded="{{ request()->is('tickettypes*', 'ticketcategories*', 'ticketsubtypes*', 'ticketsetting*') ? 'true' : 'false' }}"
                                 href="#ticketSetting">
                                 <span class="nav-link-text ms-2 "> Tickets </span>
                             </a>
-                            <div class="collapse" id="ticketSetting" style="">
+                            <div class="collapse {{ request()->is('tickettypes*', 'ticketcategories*', 'ticketsubtypes*', 'ticketsetting*') ? 'show' : '' }}" id="ticketSetting" style="">
                                 <ul class="nav ms-3 nav-sm flex-column">
                                     @can('ticketType.index')
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->is('tickettypes') ? 'active' : '' }}"
+                                            <a class="nav-link {{ request()->is('tickettypes*') ? 'active' : '' }}"
                                                 href="{{ route('tickettypes.index') }}">
                                                 <!-- <span class="sidenav-mini-icon"> TT </span> -->
                                                 <span class="sidenav-normal">Ticket Type</span>
                                             </a>
                                         </li>
                                     @endcan
+                                    @can('ticketCategory.index')
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ request()->is('ticketcategories*') ? 'active' : '' }}" href="{{ route('ticketcategories.index') }}">
+                                                <span class="sidenav-mini-icon"> C </span>
+                                                <span class="sidenav-normal"> Ticket Categories </span>
+                                            </a>
+                                        </li>
+                                    @endcan
                                     @can('ticketSubType.index')
                                         <li class="nav-item">
-                                            <a class="nav-link {{ request()->is('ticketsubtypes') ? 'active' : '' }}"
+                                            <a class="nav-link {{ request()->is('ticketsubtypes*') ? 'active' : '' }}"
                                                 href="{{ route('ticketsubtypes.index') }}">
                                                 <!-- <span class="sidenav-mini-icon"> TST </span> -->
-                                                <span class="sidenav-normal"> Ticket Sub Types </span>
+                                                <span class="sidenav-normal"> Ticket Sub-Categories </span>
                                             </a>
                                         </li>
                                     @endcan

@@ -13,7 +13,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('tickets:check-escalations')->everyMinute();
+        $schedule->command('tickets:check-escalations')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/ticket_escalations.log'));
         $schedule->command('check:inactive-users-employees')->daily();
         $schedule->command('queue:restart')
             ->everySixHours();

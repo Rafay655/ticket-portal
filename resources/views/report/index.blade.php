@@ -131,12 +131,12 @@
         var e = document.getElementById("filetype");
         var value = e.value;
         if (value != 'pdf' && value != 'excel') {
-            alert("Kindly select file type");
+            AppMessages.show({ type: 'error', message: "Kindly select file type" });
             return;
         }
         var filters = getFiltersForActiveTab();
         if (filters == 0) {
-            alert(errorMessage);
+            AppMessages.show({ type: 'error', message: errorMessage });
             return;
         }
         

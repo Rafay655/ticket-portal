@@ -16,13 +16,11 @@ class TicketTypeController extends Controller
     public function index(Request $request)
     {
         RolesPermissionController::can(['ticketType.index']);
-        $perPage = $request->input('perpage', 10); // Default to 10 items per page if not specified
-        $data = [];
-        $data['tickettypes'] = TicketType::paginate($perPage)->appends(['perpage' => $perPage]); // Paginate and append 'perpage' to links
-        $data['perPage'] = $perPage; // Current per-page value
-        return view('tickettypes.index', $data);
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $tickettypes = \App\Support\ListingFilters::paginate(TicketType::query(), $request, ['name']);
+        return view('tickettypes.index', compact('tickettypes', 'perPage'));
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -33,7 +31,7 @@ class TicketTypeController extends Controller
         $data = [];
         return view('tickettypes.create',$data);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
@@ -44,7 +42,7 @@ class TicketTypeController extends Controller
         TicketType::create($input);
         return redirect()->route('tickettypes.index')->with('success', 'Create successfully!');
     }
-    
+
     /**
      * Display the specified resource.
      */
@@ -52,7 +50,7 @@ class TicketTypeController extends Controller
     {
         //
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -82,6 +80,9 @@ class TicketTypeController extends Controller
     public function destroy(TicketType $tickettype)
     {
         RolesPermissionController::can(['ticketType.delete']);
+        if ($tickettype->categories()->exists() || \App\Models\Ticket::where('tickettype_id', $tickettype->id)->exists()) {
+            return ['error', 'This Ticket Type cannot be deleted because it has Ticket Categories or tickets.'];
+        }
         if ($tickettype->delete()) {
             return ['deleted', 'Ticket type has been deleted'];
         } else {

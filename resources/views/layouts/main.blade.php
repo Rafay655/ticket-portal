@@ -9,8 +9,6 @@
   <link href="{{ asset('assets/css/report.css') }}?v={{ time() }}" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.0/dist/css/tom-select.css">
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.0/dist/js/tom-select.complete.min.js"></script>
-  <!-- Include Toastify CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.0/toastify.min.css" />
 
 
   <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"> -->
@@ -55,7 +53,6 @@
     {{-- main conetns ends here --}}
 
   </main>
-  @include('layouts.partials.ui_change')
   <!--   Core JS Files   -->
   @include('layouts.partials.core_script')
 
@@ -67,32 +64,6 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.11.0/toastify.min.js"></script>
-
-    <!-- Check for session messages and show Toastify notifications -->
-    <script>
-        @if(session('error'))
-            Toastify({
-                text: "{{ session('error') }}",
-                duration: 3000,  // duration in milliseconds
-                close: true,
-                gravity: "top",  // Positioning: top or bottom
-                position: "right",  // Positioning: left, center, or right
-                backgroundColor: "#e74a3b", // Red color for error
-                stopOnFocus: true
-            }).showToast();
-        @elseif(session('success'))
-            Toastify({
-                text: "{{ session('success') }}",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#28a745", // Green color for success
-                stopOnFocus: true
-            }).showToast();
-        @endif
-    </script>
 <script>
 
   // hide loadin

@@ -25,25 +25,13 @@
                   <div class="card-body">
                     <div class="row">
 
-                      <div class="form-group col-md-6 @error('ticket_type_id') is-invalid @enderror">
-                      <label for="ticket_type_id" class="form-control-label">Ticket Type</label>
-                        <select class="form-control" name="ticket_type_id" id="ticket_type_id" >
-                          @foreach($tickettypes as $tickettype)
-                            <option {{$ticketsetting->ticket_type_id == $tickettype->id ? "selected" : ""}} value="{{$tickettype->id}}">{{$tickettype->name}}</option>
-                          @endforeach
-                        </select>
-                      </div>
-
-                      <div class="form-group col-md-6 @error('ticket_sub_type_id') is-invalid @enderror">
-                        <label for="ticket_sub_type_id" class="form-control-label">Sub Type</label>
-                        <select class="form-control" name="ticket_sub_type_id" id="ticket_sub_type_id" >
-                          @foreach($ticketsubtypes as $ticketsubtype)
-                            <option {{$ticketsetting->ticket_sub_type_id == $ticketsubtype->id ? "selected" : ""}} value="{{$ticketsubtype->id}}">{{$ticketsubtype->name}}</option>
-                          @endforeach
-                        </select>
-                      </div>
-
-                      <div class="col-12">
+                      @include('tickets.partials.hierarchy-fields', [
+                      'typeField' => 'ticket_type_id', 'subCategoryField' => 'ticket_sub_type_id',
+                      'selectedType' => $ticketsetting->ticket_type_id ?? null,
+                      'selectedCategory' => $ticketsetting->ticket_sub_type->ticket_category_id ?? null,
+                      'selectedSubCategory' => $ticketsetting->ticket_sub_type_id ?? null,
+                  ])
+                  <div class="col-12">
                         <table class="table table-striped" id="ticketsettingtable">
                           <thead>
                             <tr>

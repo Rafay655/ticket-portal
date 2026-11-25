@@ -34,6 +34,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\TicketTypeController;
+use App\Http\Controllers\TicketCategoryController;
 use App\Http\Controllers\TicketSubTypeController;
 use App\Http\Controllers\TicketSettingController;
 use App\Http\Controllers\EmployeesController;
@@ -99,6 +100,9 @@ Route::middleware('auth')->group(function () {
     Route::post('feedback_add', [TicketsController::class, 'feedback_add'])->name('feedback.add');
     Route::post('comment/add', [TicketsController::class, 'comment_add'])->name('comment.add');
     
+    Route::get('ticket/close/{id}', function (\Illuminate\Http\Request $request, $id) {
+        return redirect()->route('ticket.view', ['id' => $id, 'return_to' => $request->query('return_to')]);
+    })->whereNumber('id')->name('ticket.close.preview');
     Route::post('ticket/close/{id}',  [TicketsController::class, 'ticket_close'])->name('ticket.close');
 
     Route::resource('slapolicies', SlaPolicyController::class);
@@ -109,6 +113,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('grades', GradeController::class);
     Route::resource('regions', RegionController::class);
     Route::resource('tickettypes', TicketTypeController::class);
+    Route::resource('ticketcategories', TicketCategoryController::class)->except('show');
     Route::resource('ticketsubtypes', TicketSubTypeController::class);
     Route::resource('ticketsetting', TicketSettingController::class);
     Route::resource('pdfreports', ReportController::class);

@@ -12,8 +12,20 @@ class TicketSubType extends Model
     protected $fillable = [ 
         'name',
         'priority',
+        'ticket_category_id',
     ];
-        public function types()
+    public function category()
+    {
+        return $this->belongsTo(TicketCategory::class, 'ticket_category_id');
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class, 'ticketsubtype_id');
+    }
+
+    // Legacy settings links remain available for historical records.
+    public function types()
     {
         return $this->belongsToMany(
             TicketType::class,

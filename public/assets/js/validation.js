@@ -54,9 +54,11 @@ var button = $('.btn-ladda');
             console.log(response);
         });
 
-        this.on("error", function(file, errorMessage) {
+        this.on("error", function(file, errorMessage, xhr) {
             // Handle file upload errors
-            console.log(errorMessage);
+            Ladda.stopAll();
+            if (xhr) AppMessages.requestError(xhr);
+            else AppMessages.show({ type: 'error', message: errorMessage });
         });
     }
   };
@@ -220,11 +222,7 @@ $('body').on('click','#table_data_delete',function(e){
         method: "Delete",
         data: data,
         error: function(res){
-          console.log(res.responseJSON.message);
-          basciAlert({
-            type: 'error',
-            message: "Could not send request to the server",
-          })
+          AppMessages.requestError(res);
         },
         success: function(res){
           console.log(res[2]);
@@ -256,3 +254,12 @@ $('body').on('click','#table_data_delete',function(e){
     }
    })
 })
+
+// Display HTTP failures from portal AJAX requests through the same message modal.
+$(function () {
+  $(document).ajaxError(function (event, xhr) {
+    if (xhr.status === 0 && xhr.statusText === "abort") return;
+    Ladda.stopAll();
+    AppMessages.requestError(xhr);
+  });
+});

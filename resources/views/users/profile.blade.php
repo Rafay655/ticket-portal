@@ -433,12 +433,12 @@
     var confirmPassword = document.getElementById('confirm_password').value;
 
     if (newPassword === '' || confirmPassword === '') {
-      alert('Please fill out both password fields.');
+      AppMessages.show({ type: 'error', message: 'Please fill out both password fields.' });
       return;
     }
 
     if (newPassword.length < 8) {
-      alert('Password must be at least 8 characters long.');
+      AppMessages.show({ type: 'error', message: 'Password must be at least 8 characters long.' });
       return;
     }
 
@@ -447,22 +447,22 @@
     var specialCharacterPattern = /[!@#$%^&*(),.?":{}|<>]/;
 
     if (!upperCasePattern.test(newPassword)) {
-      alert('Password must contain at least one uppercase letter.');
+      AppMessages.show({ type: 'error', message: 'Password must contain at least one uppercase letter.' });
       return;
     }
 
     if (!numberPattern.test(newPassword)) {
-      alert('Password must contain at least one number.');
+      AppMessages.show({ type: 'error', message: 'Password must contain at least one number.' });
       return;
     }
 
     if (!specialCharacterPattern.test(newPassword)) {
-      alert('Password must contain at least one special character.');
+      AppMessages.show({ type: 'error', message: 'Password must contain at least one special character.' });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert('Passwords do not match!');
+      AppMessages.show({ type: 'error', message: 'Passwords do not match!' });
       return;
     }
 

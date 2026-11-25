@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 use Illuminate\Support\Facades\Log;
+use App\Services\RegionalPocContacts;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -37,6 +38,9 @@ class UserCreatedNotification extends Mailable
                 ->with([
                     'user' => $this->user,
                     'password' => $this->password,
+                    'regionalPocs' => (new RegionalPocContacts(config('account_email.regional_pocs', [])))->forUser($this->user),
+                    'googlePlayUrl' => config('account_email.google_play_url'),
+                    'appStoreUrl' => config('account_email.app_store_url'),
                 ]);
 }
 

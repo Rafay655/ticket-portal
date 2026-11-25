@@ -1,11 +1,6 @@
-<div class="row">
+<div class="row dashboard-stats">
     <div class="col-lg-12">
-        <div class="row mb-3">
-            <div class="col-1 col-sm-6"></div>
-             @php
-    $allowedDesignations = [25];
-@endphp
-        </div>
+        @php $allowedDesignations = [25]; @endphp
         <div class="row">
             <div class="col-lg-3 col-md-6 col-12">
                 <div class="card  mb-4">

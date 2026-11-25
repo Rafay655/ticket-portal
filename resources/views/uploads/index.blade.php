@@ -47,21 +47,6 @@
                     </li>
 
                 </ul>
-                @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-            @if(session()->has('failures'))
-                <div class="alert alert-danger">
-                    <h4>There were errors in your file:</h4>
-                    <ul>
-                        @foreach(session('failures') as $failure)
-                            <li>Row {{ $failure->row()-1 }}: {{ implode(', ', $failure->errors()) }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
                 <div class="tab-content text-left ">
                     <div role="tabpanel" class="tab-pane fade show active" id="tab1">
                         <div class="row">

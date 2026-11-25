@@ -17,13 +17,14 @@ class FirstTabExport implements FromArray
     {
         $data = [];
         // Define the headers for the first sheet
-        $data[] = ['ID', 'Ticket Type', 'Ticket Subtype', 'Requested By', 'Status','Assigned To','Level','Description'];;
+        $data[] = ['ID', 'Ticket Type', 'Ticket Category', 'Ticket Sub-Category', 'Requested By', 'Status','Assigned To','Level','Description'];;
 
         // Add data rows for the first tab
         foreach ($this->data as $ticket) {
             $data[] = [
                 $ticket->id,
                 $ticket->tickettype->name,
+                $ticket->ticket_category_name ?? 'Not assigned',
                 $ticket->ticketsubtype->name,
                 $ticket->requestedby->name,
                 $ticket->status,

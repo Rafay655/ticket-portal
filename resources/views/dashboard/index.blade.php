@@ -10,12 +10,16 @@
             </a>
         </li>
         <li class="breadcrumb-item text-sm text-white active"><a class="opacity-5 text-white"
-                href="javascript:;">Dashoard</a></li>
+                href="javascript:;">Dashboard</a></li>
     </ol>
     <h6 class="font-weight-bolder mb-0 text-white">Dashboard</h6>
 </nav>
 @endsection
+@section('style')
+<link rel="stylesheet" href="{{ asset('assets/css/dashboard.css') }}?v=20261125-2">
+@endsection
 @section('content')
+<div class="dashboard-layout">
 @include('dashboard.partials.top_stats')
 @php
     $allowedDesignations = [25];
@@ -33,7 +37,7 @@
     @include('dashboard.partials.employee')
 @endif
 
-
+</div>
 @endsection
 
 @section('script')
@@ -43,145 +47,56 @@
 )
 <script>
 
-const ticketData = @json($ticketTypePercentages); // Your PHP variable
-    const ticketSubtypeData = @json($ticketSubTypePercentages); // Your PHP variable
+const ticketData = @json($ticketTypePercentages);
+const ticketCategoryData = @json($ticketCategoryPercentages);
+const ticketSubtypeData = @json($ticketSubTypePercentages);
 
-    const labelsTicketType = ticketData.map(item => item.tickettype.name); // Assuming 'name' is the property for ticket type names
-    const dataTicketType = ticketData.map(item => item.counter);
-    const colorTicketType = ticketData.map(item => item.color);
-
-    const labelsTicketSubType = ticketSubtypeData.map(item => item.ticketsubtype.name); // Assuming 'name' is the property for ticket type names
-    const dataTicketSubType = ticketSubtypeData.map(item => item.counter);
-    const colorTicketSubType = ticketSubtypeData.map(item => item.color);
-  
-    const pieLabelsLine = {
-        id: "pieLabelsLine",
-        afterDraw(chart) {
-            const {
-                ctx,
-                chartArea: { width, height, top, left },
-            } = chart;
-            const cx = left + width / 2;
-            const cy = top + height / 2;
-            const sum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-
-            chart.data.datasets.forEach((dataset, i) => {
-                chart.getDatasetMeta(i).data.forEach((datapoint, index) => {
-                    const { x: a, y: b } = datapoint.tooltipPosition();
-                    const outerRadius = datapoint.outerRadius;
-                    const x =
-                        cx +
-                        ((a - cx) / Math.sqrt(Math.pow(a - cx, 2) + Math.pow(b - cy, 2))) *
-                        outerRadius;
-                    const y =
-                        cy +
-                        ((b - cy) / Math.sqrt(Math.pow(a - cx, 2) + Math.pow(b - cy, 2))) *
-                        outerRadius;
-                    const halfwidth = width / 2;
-                    const halfheight = height / 2;
-                    const xLine = x >= halfwidth ? x + 20 : x - 20;
-                    const yLine = y >= halfheight ? y + 20 : y - 20;
-                    const extraLine = x >= halfwidth ? 10 : -10;
-                    ctx.beginPath();
-                    ctx.moveTo(x, y);
-                    ctx.fill();
-                    ctx.moveTo(x, y);
-                    ctx.lineTo(xLine, yLine);
-                    ctx.lineTo(xLine + extraLine, yLine);
-                    ctx.strokeStyle = dataset.backgroundColor[index];
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                    const percentage =
-                        ((chart.data.datasets[0].data[index] ) );
-                    ctx.font = "10px Arial";
-                    const textXPosition = x >= halfwidth ? "left" : "right";
-                    const plusFivePx = x >= halfwidth ? 5 : -5;
-                    ctx.textAlign = textXPosition;
-                    ctx.textBaseline = "middle";
-                    ctx.fillStyle = dataset.backgroundColor[index];
-
-                    ctx.fillText(percentage, xLine + extraLine + plusFivePx, yLine);
-                });
-            });
-        },
-    };
-
-    // Initialize first doughnut chart
-    const ctx = document.getElementById("myChart").getContext("2d");
-    const myChart = new Chart(ctx, {
-        type: "doughnut",
+const pieLabelsLine = {
+    id: 'pieLabelsLine',
+    afterDraw(chart) {
+        const {ctx, chartArea: {left, right, top, bottom}} = chart;
+        const cx = (left + right) / 2;
+        const cy = (top + bottom) / 2;
+        ctx.save();
+        chart.getDatasetMeta(0).data.forEach((arc, index) => {
+            const count = chart.data.datasets[0].data[index];
+            if (!count || !arc.outerRadius) return;
+            const angle = (arc.startAngle + arc.endAngle) / 2;
+            const x = cx + Math.cos(angle) * arc.outerRadius;
+            const y = cy + Math.sin(angle) * arc.outerRadius;
+            const side = Math.cos(angle) >= 0 ? 1 : -1;
+            const endX = x + side * 12;
+            const endY = y + Math.sin(angle) * 12;
+            ctx.strokeStyle = chart.data.datasets[0].backgroundColor[index];
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(endX,endY); ctx.lineTo(endX + side * 8,endY); ctx.stroke();
+            ctx.font = '11px Arial'; ctx.textAlign = side > 0 ? 'left' : 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText(count, endX + side * 12, endY);
+        });
+        ctx.restore();
+    }
+};
+function createTicketDonut(id, rows, relation) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    new Chart(canvas.getContext('2d'), {
+        type: 'doughnut',
         data: {
-            labels: labelsTicketType,
-            datasets: [
-                {
-
-                    data: dataTicketType,
-                    backgroundColor: colorTicketType,
-                    borderColor: colorTicketType,
-                    borderWidth: 1,
-                    cutout: "70%"
-                },
-            ],
+            labels: rows.map(item => relation ? (item[relation]?.name ?? 'Not assigned') : item.name),
+            datasets: [{data: rows.map(item => Number(item.counter)), backgroundColor: rows.map(item => item.color), borderWidth: 0}]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false,
-                  
-                },
-            },
-            layout: {
-                padding: {
-                    left: 20,
-                    right: 20,
-                    top: 20,
-                    bottom: 20,
-                },
-            },
+            responsive: true, maintainAspectRatio: false, cutout: '70%',
+            layout: {padding: 32},
+            plugins: {legend: {display: false}}
         },
-        plugins: [pieLabelsLine],
+        plugins: [pieLabelsLine]
     });
-
-    // Initialize second doughnut chart
-    const ctx2 = document.getElementById("myDoughnutChart").getContext("2d");
-    const myDoughnutChart = new Chart(ctx2, {
-        type: "doughnut",
-        data: {
-            labels: labelsTicketSubType,
-            datasets: [
-                {
-
-                    data: dataTicketSubType,
-                    backgroundColor: colorTicketSubType,
-                    borderColor: colorTicketSubType,
-                    borderWidth: 1,
-                    cutout: "70%"
-                },
-            ],
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            layout: {
-                padding: {
-                    left: 0,
-                    right: 0,
-                    top: 30,
-                    bottom: 30,
-                },
-            },
-            plugins: {
-                legend: {
-                    display: false,
-                 
-                },
-            },
-        },
-        plugins: [pieLabelsLine],
-    });
-
+}
+createTicketDonut('myChart', ticketData, 'tickettype');
+createTicketDonut('ticketCategoryChart', ticketCategoryData, null);
+createTicketDonut('myDoughnutChart', ticketSubtypeData, 'ticketsubtype');
 
     // Initialize line chart
     const ctx1 = document.getElementById("ticketChart").getContext("2d");
@@ -252,13 +167,14 @@ const ticketData = @json($ticketTypePercentages); // Your PHP variable
             ],
         },
         options: {
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     beginAtZero: true
                 },
                 y: {
                     beginAtZero: true,
-                    max: 100,
+                    ticks: { precision: 0 },
                     title: {
                         display: true,
                         text: "Tickets",

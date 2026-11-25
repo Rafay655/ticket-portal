@@ -31,8 +31,8 @@ public function index(Request $request)
 {
     RolesPermissionController::can(['employee.index']);
 
-    $search       = $request->input('search', '');
-    $perpageInput = $request->input('perpage', '10');
+    $search       = \App\Support\ListingFilters::search($request);
+    $perpageInput = \App\Support\ListingFilters::perPage($request);
 
     // 1) Build the base query
    if (auth()->user()->can('admindashboard.index') || in_array(auth()->id(), [531, 532])) {
@@ -63,6 +63,8 @@ public function index(Request $request)
             $q->where('employee_id', 'like', "%{$search}%")
               ->orWhere('name',        'like', "%{$search}%")
               ->orWhere('email',       'like', "%{$search}%")
+              ->orWhereHas('department', fn ($related) => $related->where('name', 'like', "%{$search}%"))
+              ->orWhereHas('designation', fn ($related) => $related->where('name', 'like', "%{$search}%"))
               ->orWhereHas('user.roles', function($qr) use ($search) {
                   $qr->where('name', 'like', "%{$search}%");
               });
@@ -78,7 +80,7 @@ public function index(Request $request)
 
     // 4) Paginate & append params
     $employees = $query
-        ->orderBy('updated_at','desc')
+        ->orderBy('updated_at', 'desc')->orderBy('id', 'desc')
         ->paginate($perPage)
         ->appends([
             'perpage' => $perpageInput,
@@ -130,7 +132,7 @@ private function getAllSubordinateIds($managerId): array
             $data['grades'] = Grade::select('name', 'id')->get();
             $data['regions'] = Region::where('p_region_id', 0)->get();
             $data['sub_regions'] = Region::where('p_region_id', '>', 0)->get();
-            
+
             $data['employees'] = Employee::with(['user.roles:id,name'])
                 ->get()
                 ->map(function ($employee) {
@@ -156,14 +158,14 @@ private function getAllSubordinateIds($managerId): array
         try {
             // Check permissions
             RolesPermissionController::can(['employee.create']);
-          
+
             // Validate core fields + regions/sub-region
             $request->validate([
                 'employee_id' => 'required|unique:employees,employee_id',
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'roles' => 'required',
-                
+
                 'report_to' => 'nullable|exists:employees,employee_id',
             ]);
            $regions_id = array_map(
@@ -179,7 +181,7 @@ private function getAllSubordinateIds($managerId): array
             $userData['designation_id'] = $request->designation_id;
             $userData['user_type'] = 'employee';
             $userData['region_ids'] =  $regions_id;
-          
+
             // Image on user (if you store it here)
             if ($request->hasFile('image')) {
                 $filename = time() . '.' . $request->image->getClientOriginalExtension();
@@ -207,10 +209,10 @@ private function getAllSubordinateIds($managerId): array
                 'report_to' => $request->input('report_to'),
                 'status' => 1,
             ];
-         
-           
-           
-           
+
+
+
+
 
             // Carry over image if stored on employees table instead
             if (!empty($userData['image'])) {
@@ -272,10 +274,10 @@ private function getAllSubordinateIds($managerId): array
     public function employeeSeparationIndex(Request $request)
     {
         RolesPermissionController::can(['admindashboard.index']);
-        $perPage = $request->get('perpage', 10);
+        $perPage = \App\Support\ListingFilters::perPage($request);
 
         // Fetch separated employees with pagination
-        $employeeSeparations = \App\Models\EmployeeSeparation::with('department', 'designation')->paginate($perPage);
+        $employeeSeparations = \App\Support\ListingFilters::paginate(\App\Models\EmployeeSeparation::query()->with('department', 'designation'), $request, ['employee_id', 'name', 'email', 'separation_date'], ['department' => ['name'], 'designation' => ['name']]);
 
         return view('employees.employee_separation', compact('employeeSeparations', 'perPage'));
     }
@@ -356,27 +358,27 @@ private function getAllSubordinateIds($managerId): array
             ->route('employees.index')
             ->with('error', ['Associated user not found.']);
     }
-    
+
         // Prepare and validate input
         $regions_id = array_map('intval', $request->input('region_id', []));
         $validator = Validator::make($request->all(), [
             'employee_id'    => 'required|unique:employees,employee_id,' . $employee->id,
             'name'           => 'required|string|max:255',
             'email'          => 'required|email|unique:users,email,' . $user->id,
-           
+
             'report_to'      => 'nullable|exists:employees,employee_id',
 
         ]);
        if ($validator->fails()) {
         // grab all error messages
         $errors = $validator->errors()->all();
-    
+
         return redirect()->back()
             ->withInput()
               ->with('error', implode(', ', $errors));
     }
-    
-    
+
+
         // Handle profile image if uploaded
         if ($request->hasFile('image')) {
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
@@ -384,7 +386,7 @@ private function getAllSubordinateIds($managerId): array
             $user->image     = $filename;
             $employee->image = $filename;
         }
-    
+
         // Update User fields
         $user->name           = $request->name;
         $user->email          = $request->email;
@@ -393,10 +395,10 @@ private function getAllSubordinateIds($managerId): array
         $user->region_ids     = $regions_id;
         // (If you have user_type or status fields you want to allow editing, include them here)
         $user->save();
-    
+
         // Sync roles
         $user->syncRoles($request->roles);
-    
+
         // Update Employee fields
         $employee->employee_id   = $request->employee_id;
         $employee->name          = $request->name;
@@ -411,7 +413,7 @@ private function getAllSubordinateIds($managerId): array
         $employee->report_to       = $request->report_to;
         $employee->status          = $request->status ?? $employee->status;
         $employee->save();
-    
+
         return redirect()
             ->route('employees.index')
             ->with('success', 'Employee and user records have been updated.');

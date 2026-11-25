@@ -16,7 +16,7 @@
             padding: 0;
         }
         table {
-            max-width: 600px;
+            max-width: 820px;
             margin: 20px auto;
             background-color: #ffffff;
             border-radius: 15px;
@@ -72,58 +72,9 @@
            
             <p><em>Note: For security reasons, please change your password immediately after logging in for the first time.</em></p>
          
-                <p>If you require any assistance, please reach out to your designated HRPSP Regional HR Point of Contact (PoC) listed below.</p>
-                <p>
-                Should your grievance remain unresolved beyond the defined resolution timeline, you may escalate the matter by contacting Shan Elahi at 
-                <a href="mailto:shan.elahi@guest.jazz.com.pk">shan.elahi@guest.jazz.com.pk</a> and copying <a href="mailto:hr@hrpsp.net">hr@hrpsp.net</a> for record and visibility.
-            </p>
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #333;">
-                <thead>
-                    <tr style="background-color: #f0f0f0;">
-                        <th style="border: 1px solid #ddd; padding: 8px;">Sr#</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Name</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Designation</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Region</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Email (Primary)</th>
-                        <th style="border: 1px solid #ddd; padding: 8px;">Mobile Number</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">1</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Quratul Ain Adnan</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Assistant Manager HR Operations</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">South</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">quratulain.adnan@hrpsp.net</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">03171071144</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">2</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Muzaffar Mehmood</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Assistant Manager HR Operations</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Central A</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">muzaffar.mehmood@hrpsp.net</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">03077008088</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">3</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Mubashir Hassan</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Senior Executive HR</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Central B, Central C</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">mubashir.hassan@hrpsp.net</td>
-                  
-                        <td style="border: 1px solid #ddd; padding: 8px;">03167650007</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ddd; padding: 8px;">4</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Abdullah Babar</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">Executive HR</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">North, North West</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">abdullah.babar@hrpsp.net</td>
-                        <td style="border: 1px solid #ddd; padding: 8px;">03219905112</td>
-                    </tr>
-                </tbody>
-            </table>
+            @include('emails.partials.regional-poc')
+            <p>Should your grievance remain unresolved beyond the defined resolution timeline, you may escalate the matter by contacting Shan Elahi at <a href="mailto:shan.elahi@guest.jazz.com.pk">shan.elahi@guest.jazz.com.pk</a> and copying <a href="mailto:hr@hrpsp.net">hr@hrpsp.net</a> for record and visibility.</p>
+            @include('emails.partials.app-downloads')
           
             <p style="margin-top: 20px; font-weight:700;font-style: italic; font-size: 16px; color: #FF0000;">
                 *This is an automated message from Flexi Desk. Please do not reply to this email.

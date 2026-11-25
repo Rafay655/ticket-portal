@@ -125,7 +125,7 @@
                         <td><strong>Ticket Type:</strong> {{ $ticket->tickettype->name}}</td>
                     </tr>
                     <tr>
-                        <td><strong>Sub Type:</strong> {{$ticket->ticketsubtype->name}}</td>
+                        <td><strong>Ticket Sub-Category:</strong> {{$ticket->ticketsubtype->name}}</td>
                     </tr>
                     <tr>
                         <td><strong>Priority:</strong> {{$ticket->ticketsubtype->priority}}</td>
@@ -142,7 +142,7 @@
                         </tr>
                     @endif
 
-                    @if(!empty($comment['voice_note']))
+                    @if(!empty($comment['voice_note_path']) || !empty($comment['has_voice_note']))
                         <tr>
                             <td><strong>Voice Note:</strong> A voice note has been sent.</td>
                         </tr>

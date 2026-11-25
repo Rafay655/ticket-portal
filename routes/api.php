@@ -60,6 +60,8 @@ Route::prefix('auth')->group(function () {
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/ticket-types', [TicketTypeController::class, 'index']);
     Route::get('/ticket-types/{ticketType}/sub-types', [TicketTypeController::class, 'subTypes']);
+    Route::get('/ticket-types/{ticketType}/categories', [TicketTypeController::class, 'categories']);
+    Route::get('/ticket-categories/{ticketCategory}/sub-categories', [TicketTypeController::class, 'categorySubCategories']);
 });
 
 Route::middleware('auth:sanctum')->prefix('tickets')->group(function () {

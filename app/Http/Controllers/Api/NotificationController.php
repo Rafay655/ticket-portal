@@ -79,7 +79,8 @@ public function getTicketData($ticketId)
 {
     $ticket = Ticket::with([
         'tickettype:id,name',
-        'ticketSubType:id,name,priority',
+        'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
         'requestedby:id,name',
         'assignto:id,name',
         'feedback',

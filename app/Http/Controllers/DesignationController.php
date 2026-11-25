@@ -15,18 +15,13 @@ class DesignationController extends Controller
      */
     public function index(Request $request)
     {
-        // Set default per-page value
         RolesPermissionController::can(['designation.index']);
-        $perPage = $request->input('perpage', 10);
-        
-        // Fetch all designations with pagination
-        $designations = Designation::paginate($perPage)->appends(['perpage' => $perPage]);
-        
-        // Pass designations and perPage value to the view
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $designations = \App\Support\ListingFilters::paginate(Designation::query(), $request, ['name']);
         return view('designations.index', compact('designations', 'perPage'));
     }
-    
-    
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -37,7 +32,7 @@ class DesignationController extends Controller
         $data = [];
         return view('designations.create',$data);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
@@ -48,7 +43,7 @@ class DesignationController extends Controller
         Designation::create($input);
         return redirect()->route('designations.index')->with('success', 'Create successfully!');
     }
-    
+
     /**
      * Display the specified resource.
      */
@@ -56,7 +51,7 @@ class DesignationController extends Controller
     {
         //
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -67,7 +62,7 @@ class DesignationController extends Controller
         $data['designation'] = $designation;
         return view('designations.edit',$data);
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -79,7 +74,7 @@ class DesignationController extends Controller
         $designation->save();
         return redirect()->route('designations.index')->with('success', 'Update successfully!');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */

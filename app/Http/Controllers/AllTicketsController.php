@@ -19,34 +19,17 @@ public function index(Request $request)
         abort(401, 'Unauthorized');
     }
 
-    $perPageInput = $request->input('perpage', '10');
-    $search       = $request->input('search', '');
+    $perPageInput = \App\Support\ListingFilters::perPage($request);
+    $search       = \App\Support\ListingFilters::search($request);
 
     // Base query + eager loads
     $query = Ticket::with([
-        'tickettype', 'ticketsubtype', 'comments',
+        'tickettype', 'ticketsubtype.category', 'ticketCategory', 'comments',
         'requestedby', 'assignto'
     ]);
 
     // Server-side search
-    if (trim($search) !== '') {
-        $query->where(function($q) use ($search) {
-            $q->whereHas('tickettype', function($q2) use ($search) {
-                    $q2->where('name','like',"%{$search}%");
-                })
-                ->orWhereHas('ticketsubtype', function($q2) use ($search) {
-                    $q2->where('name','like',"%{$search}%");
-                })
-                ->orWhereHas('requestedby', function($q2) use ($search) {
-                    $q2->where('name','like',"%{$search}%");
-                })
-                ->orWhereHas('assignto', function($q2) use ($search) {
-                    $q2->where('name','like',"%{$search}%");
-                })
-                ->orWhere('status','like',"%{$search}%")
-                ->orWhereDate('created_at',$search);
-        });
-    }
+    \App\Support\ListingFilters::tickets($query, $request);
 
     // “All” handling
     if ($perPageInput === 'all') {
@@ -57,7 +40,7 @@ public function index(Request $request)
 
     // Final paginate & append
     $tickets = $query
-        ->orderBy('created_at','desc')
+        ->orderBy('created_at', 'desc')->orderBy('id', 'desc')
         ->paginate($perPage)
         ->appends([
             'perpage' => $perPageInput,
@@ -71,5 +54,5 @@ public function index(Request $request)
     ]);
 }
 
-    
+
 }

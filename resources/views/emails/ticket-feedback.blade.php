@@ -124,7 +124,7 @@
                         <td><strong>Ticket Type:</strong> {{ $ticket->tickettype->name}}</td>
                     </tr>
                     <tr>
-                        <td><strong>Sub Type:</strong> {{$ticket->ticketsubtype->name}}</td>
+                        <td><strong>Ticket Sub-Category:</strong> {{$ticket->ticketsubtype->name}}</td>
                     </tr>
                     <tr>
                         <td><strong>Priority:</strong> {{$ticket->ticketsubtype->priority}}</td>

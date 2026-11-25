@@ -36,6 +36,7 @@ filePreview.onclick = function () {
 
 removeFileBtn.onclick = function () {
     fileInput.value = '';
+    updateCommentSendState();
     progress = 0;
     filePreview.style.display = 'none';
     removeFileBtn.style.display = 'none';
@@ -143,77 +144,135 @@ audioPlayback.onended = function () {
 // Function to request microphone access
 async function getMicrophoneAccess() {
     try {
-        if (!stream) {
-            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            console.log("Microphone access granted");
+        if (!window.isSecureContext) {
+            throw Object.assign(new Error('Insecure page'), {name: 'InsecureContextError'});
         }
-        return stream; // Return the stream after access is granted
+        if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+            throw Object.assign(new Error('Unsupported recording'), {name: 'UnsupportedRecordingError'});
+        }
+        if (!stream || !stream.getAudioTracks().some(track => track.readyState === 'live')) {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        }
+        return stream;
     } catch (err) {
-        console.error("Microphone access denied:", err);
-        alert("Microphone access is required to record audio.");
-        throw err; // Throw an error to stop further execution
+        const messages = {
+            InsecureContextError: ['Secure connection required', 'Open the portal using HTTPS to record a voice note. For local testing, use localhost or a local HTTPS address.'],
+            UnsupportedRecordingError: ['Recording unavailable', 'This browser does not support voice recording. Open the portal in a supported browser such as Chrome, Edge, or Safari.'],
+            NotAllowedError: ['Microphone permission blocked', 'Allow Microphone in the site permissions beside the address bar, then try recording again. If it is already allowed, check microphone access in your device privacy settings.'],
+            SecurityError: ['Microphone access blocked', 'Your browser or device security settings are blocking microphone access. Allow microphone access for this site, then try again.'],
+            NotFoundError: ['No microphone found', 'Connect or enable a microphone, then try recording again.'],
+            NotReadableError: ['Microphone unavailable', 'Your microphone could not be opened. Check your device settings and close any other app using the microphone, then try again.'],
+            AbortError: ['Recording interrupted', 'Microphone access was interrupted. Please try recording again.']
+        };
+        const [title, message] = messages[err.name] || ['Unable to start recording', 'The microphone could not be started. Check your browser microphone permissions and try again.'];
+        await AppMessages.show({type: 'error', title, message});
+        throw err;
     }
 }
 
-// Function to start recording
+const commentSubmitForm = voiceNoteInput.form;
+const commentSendButton = commentSubmitForm.querySelector('[type="submit"]');
+const commentDescription = commentSubmitForm.querySelector('[name="description"]');
+let isPreparingRecording = false;
+let isProcessingAudio = false;
+const recordingHint = document.createElement('span');
+recordingHint.className = 'd-block text-sm text-muted mt-2';
+recordingHint.setAttribute('role', 'status');
+commentSendButton.insertAdjacentElement('afterend', recordingHint);
+
+function hasCommentContent() {
+    return Boolean(commentDescription.value.trim() || fileInput.files.length || voiceNoteInput.value.trim());
+}
+function updateCommentSendState() {
+    const busy = isRecording || isPreparingRecording || isProcessingAudio;
+    commentSendButton.disabled = busy || !hasCommentContent();
+    recordingHint.textContent = isRecording ? 'Recording… Stop recording before sending.' :
+        isProcessingAudio ? 'Preparing voice note…' : isPreparingRecording ? 'Waiting for microphone…' : '';
+}
+commentDescription.addEventListener('input', updateCommentSendState);
+fileInput.addEventListener('change', updateCommentSendState);
+commentSubmitForm.addEventListener('submit', event => {
+    if (isRecording || isPreparingRecording || isProcessingAudio || !hasCommentContent()) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        AppMessages.show({type: 'warning', message: isRecording || isProcessingAudio || isPreparingRecording ?
+            'Stop recording and wait for the voice note to finish processing before sending.' :
+            'Enter a comment, attach a file, or record a voice note before sending.'});
+    }
+}, true);
+updateCommentSendState();
+
+function resetRecordingControls() {
+    isRecording = false;
+    isPreparingRecording = false;
+    recordButton.classList.remove('active');
+    recordIcon.classList.replace('fa-stop', 'fa-microphone');
+    timerElement.style.display = 'none';
+    stopTimer();
+}
 recordButton.onclick = async function () {
+    if (isPreparingRecording || isProcessingAudio) return;
+    if (isRecording) {
+        isProcessingAudio = true;
+        resetRecordingControls();
+        updateCommentSendState();
+        mediaRecorder.stop();
+        return;
+    }
+    isPreparingRecording = true;
+    updateCommentSendState();
     try {
-        // Request microphone access before starting recording
         const micStream = await getMicrophoneAccess();
-
-        if (!isRecording) {
-            mediaRecorder = new MediaRecorder(micStream); // Use the stream with granted access
-            mediaRecorder.start();
-
-            recordButton.classList.add("active");
-            recordIcon.classList.replace("fa-microphone", "fa-stop");
-
-            audioChunks = [];
-
-            mediaRecorder.ondataavailable = event => {
-                audioChunks.push(event.data);
-            };
-
-            isRecording = true;
-            timerElement.style.display = "block";
-            seconds = 0;
-            minutes = 0;
-            updateTimer();
-            startTimer(); // Start the timer
-        } else {
-            // Stop recording
-            mediaRecorder.stop();
-            console.log(seconds);
-
-            mediaRecorder.onstop = async () => {
-                try {
-                    const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    audioPlayback.src = audioUrl;
-
-                    // Convert audio blob to Base64 string to submit with the form
+        mediaRecorder = new MediaRecorder(micStream);
+        audioChunks = [];
+        voiceNoteInput.value = '';
+        updateCommentSendState();
+        voicepreview.style.display = 'none';
+        removeVoiceBtn.style.display = 'none';
+        mediaRecorder.ondataavailable = event => { if (event.data.size) audioChunks.push(event.data); };
+        mediaRecorder.onstop = async () => {
+            isProcessingAudio = true;
+            resetRecordingControls();
+            updateCommentSendState();
+            try {
+                const blob = new Blob(audioChunks, {type: mediaRecorder.mimeType || 'audio/webm'});
+                if (!blob.size) throw new Error('Empty recording');
+                const data = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    reader.onloadend = function () {
-                        voiceNoteInput.value = reader.result; // Set the hidden input value with base64 string
-                    };
-                    reader.readAsDataURL(audioBlob);
-                } catch (err) {
-                    console.error("Error processing the audio data:", err);
-                }
-            };
-
-            recordButton.classList.remove("active");
-            recordIcon.classList.replace("fa-stop", "fa-microphone");
-
-            timerElement.style.display = "none";
-            voicepreview.style.display = "flex";
-            removeVoiceBtn.style.display = "flex";
-
-            isRecording = false;
-            stopTimer(); // Stop the timer
-        }
-    } catch (err) {
-        console.error("Error during recording:", err);
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.onabort = reject;
+                    reader.readAsDataURL(blob);
+                });
+                if (audioPlayback.src.startsWith('blob:')) URL.revokeObjectURL(audioPlayback.src);
+                audioPlayback.src = URL.createObjectURL(blob);
+                voiceNoteInput.value = data;
+                voicepreview.style.display = 'flex';
+                removeVoiceBtn.style.display = 'flex';
+            } catch (error) {
+                voiceNoteInput.value = '';
+                await AppMessages.show({type: 'error', message: 'The voice note could not be prepared. Please record it again.'});
+            } finally {
+                micStream.getTracks().forEach(track => track.stop());
+                stream = null;
+                isProcessingAudio = false;
+                updateCommentSendState();
+            }
+        };
+        mediaRecorder.start();
+        isRecording = true;
+        isPreparingRecording = false;
+        recordButton.classList.add('active');
+        recordIcon.classList.replace('fa-microphone', 'fa-stop');
+        timerElement.style.display = 'block';
+        seconds = 0; minutes = 0;
+        updateTimer(); startTimer();
+    } catch (error) {
+        resetRecordingControls();
+        if (stream) stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    } finally {
+        updateCommentSendState();
     }
 };
 

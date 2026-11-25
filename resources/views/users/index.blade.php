@@ -43,31 +43,14 @@
         </div>
       </div>
 
-      <!-- Controls Row -->
-      <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-bottom: 1px solid #ddd;">
-        <!-- Per Page Dropdown -->
-        <form method="GET" id="perPageForm" style="width:200px;" class="d-flex align-items-center">
-          <label for="perpage" class="me-2" style="min-width: 70px; font-weight: 500;">Per Page:</label>
-          <select name="perpage" id="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
-            <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
-            <option value="20" {{ $perPage == 20 ? 'selected' : '' }}>20</option>
-            <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-          </select>
-        </form>
-
-
-        <!-- Search Bar -->
-        <div style="width: 250px;">
-          <input type="text" id="search-bar" placeholder="Search Users..." class="form-control form-control-sm">
-        </div>
-      </div>
+      @include('listings.filters', ['listingLabel' => 'Users'])
 
       <!-- Table -->
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="users-table">
+        <table data-serial-offset="{{ max(0, ($users->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="users-table">
           <thead class="thead-light">
             <tr>
+              <th data-serial-column>Sr#</th>
               <th>User ID</th>
               <th>Name</th>
               <th>Email</th>
@@ -80,6 +63,7 @@
           <tbody>
             @foreach($users as $user)
             <tr>
+              <td>{{ ($users->firstItem() ?? 1) + $loop->index }}</td>
               <td>{{ $user->user_id }}</td>
               <td>{{ $user->name }}</td>
               <td>{{ $user->email }}</td>
@@ -98,7 +82,7 @@
         <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="d-inline-block">
         @csrf
         @method('DELETE')
-        <button class="btn btn-link p-0 m-0" onclick="return confirm('Are you sure?')"
+        <button class="btn btn-link p-0 m-0" data-confirm-message="Are you sure?"
         data-bs-toggle="tooltip" data-bs-placement="top" title="Disable User">
         <i class="fas fa-trash text-danger"></i>
         </button>
@@ -108,7 +92,7 @@
       <form action="{{ route('users.reactivate', $user->id) }}" method="POST" style="display: inline;">
       @csrf
 
-      <button class="btn btn-link p-0 m-0" onclick="return confirm('Are you sure?')"
+      <button class="btn btn-link p-0 m-0" data-confirm-message="Are you sure?"
       data-bs-toggle="tooltip" data-bs-placement="top" title="Enable User">
       <!-- Font Awesome Icon with Tooltip -->
       <i class="fas fa-recycle" style="color: green;"></i>
@@ -148,15 +132,16 @@
   $(document).ready(function () {
     // Enable DataTables
     let table = $('#users-table').DataTable({
+      serverSide: false,
+      searching: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging: false, // Disable DataTables pagination to use Laravel's
       ordering: true, // Enable column sorting
       info: false // Disable DataTables info to use Laravel's pagination
     });
 
     // Add search functionality to the custom search bar
-    $('#search-bar').on('keyup', function () {
-      table.search(this.value).draw();
-    });
   });
 </script>
 @endsection

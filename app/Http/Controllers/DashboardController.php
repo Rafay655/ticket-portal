@@ -60,14 +60,14 @@ class DashboardController extends Controller
          |  RECENT TICKETS
          '----------------------------------------------------------------*/
         $lastTickets = (clone $baseQuery)
-            ->with(['tickettype','ticketsubtype','comments','requestedby','assignto'])
+            ->with(['tickettype', 'ticketsubtype.category', 'ticketCategory','comments','requestedby','assignto','feedback'])
             ->latest()
             ->take(10)
             ->get();
 
         $lastTicketsClosed = (clone $baseQuery)
-            ->with(['tickettype','ticketsubtype','comments','requestedby','assignto'])
-            ->where('status', 'Feedback')
+            ->with(['tickettype', 'ticketsubtype.category', 'ticketCategory','comments','requestedby','assignto'])
+            ->whereRaw('LOWER(status) = ?', ['feedback'])
             ->latest()
             ->take(10)
             ->get();
@@ -142,6 +142,8 @@ class DashboardController extends Controller
         });
 
       
+        $ticketCategoryPercentages = app(\App\Services\DashboardCategoryChart::class)->counts($baseQuery);
+
         $incidentStatsAdmin = [
             'open'        => (clone $baseQuery)->where('status', 'Open')->count(),
             'in_progress' => (clone $baseQuery)->where('status', 'in_progress')->count(),
@@ -196,6 +198,7 @@ class DashboardController extends Controller
             'lastTicketsClosed',
             'incidentStatsByYear',
             'ticketTypePercentages',
+            'ticketCategoryPercentages',
             'ticketSubTypePercentages',
             'incidentStatsAdmin'
         ));

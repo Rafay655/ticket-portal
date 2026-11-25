@@ -48,11 +48,11 @@
         <!-- Per-page selector -->
         <div style="min-width:150px;">
           <select name="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="5"   {{ request('perpage')=='5'   ? 'selected':'' }}>5</option>
-            <option value="10"  {{ request('perpage')=='10'  ? 'selected':'' }}>10</option>
-            <option value="20"  {{ request('perpage')=='20'  ? 'selected':'' }}>20</option>
-            <option value="50"  {{ request('perpage')=='50'  ? 'selected':'' }}>50</option>
-            <option value="all" {{ request('perpage')=='all' ? 'selected':'' }}>All</option>
+            <option value="5"   {{ request('perpage', '10')=='5'   ? 'selected':'' }}>5</option>
+            <option value="10"  {{ request('perpage', '10')=='10'  ? 'selected':'' }}>10</option>
+            <option value="20"  {{ request('perpage', '10')=='20'  ? 'selected':'' }}>20</option>
+            <option value="50"  {{ request('perpage', '10')=='50'  ? 'selected':'' }}>50</option>
+            <option value="all" {{ request('perpage', '10')=='all' ? 'selected':'' }}>All</option>
           </select>
         </div>
 
@@ -77,21 +77,22 @@
             onkeydown="if(event.key==='Enter'){ this.form.submit(); }"
           >
           <button type="submit" class="btn btn-sm btn-primary">Search</button>
+          <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary ms-2">Reset</a>
         </div>
       </form>
- 
+
       <!-- Table -->
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="employees-table">
+        <table data-serial-offset="{{ max(0, ($employees->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="employees-table">
           <thead class="thead-light">
             <tr>
-              <th>#</th>
+              <th data-serial-column>Sr#</th>
               <th>Employee ID</th>
               <th>Name</th>
               <th>Email</th>
               <th>Role</th>
               @canany(['employee.edit', 'employee.delete'])
-              
+
                 <th>Action</th>
                 @elseif (Auth::user()->id == "531")
                 <th>Action</th>
@@ -113,26 +114,26 @@
                                 <i class="fas fa-user-edit text-purple"></i>
                             </a>
                         @endif
-                
+
                       @if (Auth::user()->can('employee.delete') || in_array(Auth::user()->id, [531, 532]))
                     @if($employee->status == 1)
                         <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="d-inline-block">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-link p-0 m-0" onclick="return confirm('Are you sure?')" data-bs-toggle="tooltip" data-bs-placement="top" title="Disable Employee">
+                            <button class="btn btn-link p-0 m-0" data-confirm-message="Are you sure?" data-bs-toggle="tooltip" data-bs-placement="top" title="Disable Employee">
                                 <i class="fas fa-trash text-danger"></i>
                             </button>
                         </form>
                     @else
                         <form action="{{ route('employees.reactivate', $employee->id) }}" method="POST" class="d-inline-block">
                             @csrf
-                            <button class="btn btn-link p-0 m-0" onclick="return confirm('Are you sure?')" data-bs-toggle="tooltip" data-bs-placement="top" title="Enable Employee">
+                            <button class="btn btn-link p-0 m-0" data-confirm-message="Are you sure?" data-bs-toggle="tooltip" data-bs-placement="top" title="Enable Employee">
                                 <i class="fas fa-recycle" style="color: green;"></i>
                             </button>
                         </form>
                     @endif
                 @endif
-                
+
                     </td>
                 @endif
 
@@ -160,6 +161,9 @@
 <script>
   $(document).ready(function () {
     $('#employees-table').DataTable({
+      serverSide: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging:     false,
       ordering:   true,
       info:       false,

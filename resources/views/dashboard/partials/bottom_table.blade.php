@@ -1,56 +1,38 @@
-<div class="p-4 mt-4 py-3 card shadow-lg moveAbove-unique bg-white-custom lightborder-unique">
-    <h5 class="mb-4">Ticket Rating</h5>
+<section class="card dashboard-panel">
+    <h5>Ticket Rating</h5>
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead style="background-color:#0A3AA9;color:#fff;padding:0 20px">
-                <tr class="bordered-row" style="font-size:0.65rem">
-                    <th style="padding:10px">#</th>
-                    <th style="padding:10px"> Ticket Type</th>
-                    <th style="padding:10px"> Ticket SubType</th>
-                    <th style="padding:10px"> Requested By</th>
-                    <th style="padding:10px">Assign To</th>
-                    <th style="padding:10px">Happiness Rating</th>
-
-                </tr>
-            </thead>
+        <table class="table dashboard-table mb-0" id="dashboard-ticket-ratings">
+            <thead><tr>
+                <th>Sr#</th><th>Ticket Type</th><th>Ticket Category</th><th>Ticket Sub-Category</th>
+                <th>Requested By</th><th>Assigned To</th><th>Happiness Rating</th>
+            </tr></thead>
             <tbody>
-                @foreach ($lastTicketsClosed as $ticket)
-                    <tr style="font-size:0.65rem">
-                        <td style="padding:10px">{{ $loop->iteration }}</td>
-                        <td style="padding:10px">{{ $ticket->ticketType->name }}</td>
-                        <td style="padding:10px">{{ $ticket->ticketsubtype->name }}</td>
-                        <td style="padding:10px"> {{ $ticket->requestedBy->name ?? 'N/A' }} </td>
-                        <td style="padding:10px"> {{ $ticket->assignto->name ?? 'N/A' }} </td>
-                        <td style="padding:10px">
-                            <!-- Display Rating as Stars -->
-                            @for ($i = 1; $i <= 5; $i++)
-                                @if ($i <=  $ticket->feedback->first()->rate )
-                                    <span class="fa fa-star"></span>
-                                @else
-                                    <span class="fa fa-star-o"></span> <!-- Empty stars if needed -->
-                                @endif
-                            @endfor
-
-                            <!-- Add emoji based on the rating -->
-                            @if ($ticket->feedback->first()->rate == 5)
-                                <span>😁</span> <!-- Emoji for 5 stars -->
-                            @elseif ($ticket->feedback->first()->rate >= 4)
-                                <span>😊</span> <!-- Emoji for 4 stars -->
-                            @elseif ($ticket->feedback->first()->rate >= 3)
-                                <span>🙂</span> <!-- Emoji for 3 stars -->
-                            @elseif ($ticket->feedback->first()->rate >= 2)
-                                <span>😐</span> <!-- Emoji for 2 stars -->
+                @forelse($lastTicketsClosed as $ticket)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $ticket->ticketType->name ?? 'N/A' }}</td>
+                        <td>{{ $ticket->ticket_category_name ?? 'Not assigned' }}</td>
+                        <td>{{ $ticket->ticketsubtype->name ?? 'N/A' }}</td>
+                        <td>{{ $ticket->requestedBy->name ?? 'N/A' }}</td>
+                        <td>{{ $ticket->assignto->name ?? 'Not assigned' }}</td>
+                        <td>
+                            @php $rating = $ticket->feedback->first()?->rate; @endphp
+                            @if($rating !== null)
+                                <span class="dashboard-rating" aria-label="{{ $rating }} out of 5 stars">
+                                    @for($star = 1; $star <= 5; $star++)
+                                        <i class="fa {{ $star <= $rating ? 'fa-star' : 'fa-star-o' }}" aria-hidden="true"></i>
+                                    @endfor
+                                </span>
+                                <span class="text-muted ms-1">{{ $rating }}/5</span>
                             @else
-                                <span>😡</span> <!-- Emoji for 1 star or below -->
+                                <span class="text-muted">Not rated yet</span>
                             @endif
-
-
                         </td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr><td colspan="7" class="dashboard-empty">No ticket ratings available yet.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-</div>
-
-
+</section>

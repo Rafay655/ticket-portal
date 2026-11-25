@@ -30,7 +30,7 @@
         <tbody>
             <thead>
                 <tr>
-                    <th  class="text-uppercase text-secondary text-xs  font-weight-bolder opacity-7">#</th>
+                    <th  class="text-uppercase text-secondary text-xs  font-weight-bolder opacity-7">Sr#</th>
                     <th class="text-uppercase text-secondary text-xs  font-weight-bolder opacity-7">Permission</th>
                     <th class="text-uppercase text-secondary text-xs  font-weight-bolder opacity-7">Index</th>
                     <th class="text-uppercase text-secondary text-xs  font-weight-bolder opacity-7">View</th>

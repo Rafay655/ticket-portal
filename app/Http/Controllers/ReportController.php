@@ -42,7 +42,8 @@ class ReportController extends Controller
             case 1:
                 $query = Ticket::with([
                     'tickettype:id,name',
-                    'ticketsubtype:id,name',
+                    'ticketsubtype:id,name,ticket_category_id',
+                    'ticketsubtype.category', 'ticketCategory',
                     'requestedby:id,name',
                     'assignto:id,name',
                 ]);
@@ -59,7 +60,8 @@ class ReportController extends Controller
             case 2:
                 $query = Ticket::with([
                     'tickettype:id,name',
-                    'ticketsubtype:id,name',
+                    'ticketsubtype:id,name,ticket_category_id',
+                    'ticketsubtype.category', 'ticketCategory',
                     'requestedby:id,name',
                     'assignto:id,name',
                 ])
@@ -83,9 +85,10 @@ class ReportController extends Controller
             case 3:
                 $query = Ticket::with([
                     'tickettype:id,name',
-                    'ticketsubtype:id,name',
+                    'ticketsubtype:id,name,ticket_category_id',
+                    'ticketsubtype.category', 'ticketCategory',
 
-                ])->select('id', 'tickettype_id', 'ticketsubtype_id', 'status'); // specify the fields for Ticket model;
+                ])->select('id', 'tickettype_id', 'ticket_category_id', 'ticketsubtype_id', 'status'); // specify the fields for Ticket model;
 
                 if (!$request->has(['user', 'startDate', 'endDate'])) {
                     return response()->json(['error' => 'Missing required fields for tab 3'], 400);
@@ -101,9 +104,10 @@ class ReportController extends Controller
             case 4:
                 $query = Ticket::with([
                     'tickettype:id,name',
-                    'ticketsubtype:id,name',
+                    'ticketsubtype:id,name,ticket_category_id',
+                    'ticketsubtype.category', 'ticketCategory',
 
-                ])->select('id', 'tickettype_id', 'ticketsubtype_id', 'status');
+                ])->select('id', 'tickettype_id', 'ticket_category_id', 'ticketsubtype_id', 'status');
 
                 if (!$request->has(['startDate', 'endDate'])) {
                     return response()->json(['error' => 'Missing required fields for tab 4'], 400);
@@ -115,7 +119,7 @@ class ReportController extends Controller
                 break;
 
             case 5:
-                $query = Ticket::with(['tickettype', 'ticketsubtype',])->where('assigned_to', $request->user)
+                $query = Ticket::with(['tickettype', 'ticketsubtype.category', 'ticketCategory',])->where('assigned_to', $request->user)
                     ->whereBetween('tickets.created_at', [$request->startDate, $request->endDate])
                     ->join('ticket_feedback', 'tickets.id', '=', 'ticket_feedback.ticket_id')
                     ->select('tickets.*', 'ticket_feedback.rate');

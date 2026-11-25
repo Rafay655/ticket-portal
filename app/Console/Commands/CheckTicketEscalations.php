@@ -3,183 +3,99 @@
 namespace App\Console\Commands;
 
 use App\Models\Employee;
+use App\Models\Ticket;
+use App\Models\TicketTimeline;
 use App\Models\User;
 use App\Notifications\TicketEscalated;
+use App\Services\TicketResponseSla;
 use Illuminate\Console\Command;
-use App\Models\Ticket;
-use App\Models\BusinessHours;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class CheckTicketEscalations extends Command
 {
-   
-    protected $signature = 'tickets:check-escalations';
+    protected $signature = 'tickets:check-escalations {--dry-run : List overdue tickets without updating or notifying anyone}';
+    protected $description = 'Escalate Open tickets that exceed their enabled first-response SLA';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Check and escalate tickets based on business hours and escalation rules';
-
-    public function __construct()
+    public function handle(TicketResponseSla $sla): int
     {
-        parent::__construct();
-    }
+        if (!$sla->isConfigured()) {
+            $this->error('First-response SLA policy or business calendar is missing/invalid. No tickets were escalated.');
+            Log::warning('Ticket escalation skipped: missing SLA policy or configured business calendar.');
+            return self::FAILURE;
+        }
 
-    /**
-     * Execute the console command.
-     */
-    public function handle(): void
-    {
-        Log::info('The tickets:check-escalations command ran successfully.');
-
-        try {
-            if (!$this->isWorkingTime()) {
-                // Log and skip the process
-                $this->info('Not in working hours or on a non-working day. Skipping ticket escalation.');
-                return;
-            }
-
-            // Fetch unresolved tickets
-           $tickets = Ticket::whereIn('status', ['open', 'in_progress'])->get();
-
-            if ($tickets->isEmpty()) {
-                Log::info('No open tickets to escalate.');
-                return;
-            }
-
+        $dryRun = (bool) $this->option('dry-run');
+        $checked = 0;
+        $escalated = 0;
+        $failures = 0;
+        Ticket::whereRaw('LOWER(TRIM(status)) = ?', ['open'])->orderBy('id')->chunkById(100, function ($tickets) use ($sla, $dryRun, &$checked, &$escalated, &$failures) {
             foreach ($tickets as $ticket) {
+                $checked++;
                 try {
-                    if ($ticket->shouldEscalate()) {
-                        $this->info('Ticket #' . $ticket->id . ' should be escalated.');
-                        $this->escalateTicket($ticket);
-                    } else {
-                        $this->info('Ticket #' . $ticket->id . ' does not need escalation.');
+                    if (!$sla->shouldEscalate($ticket)) continue;
+                    if ($dryRun) {
+                        $next = $this->getNextAssignee((int) $ticket->assigned_to);
+                        $this->line('Ticket #'.$ticket->id.($next ? ' would escalate to user #'.$next : ' is overdue but has no next reporting manager').'.');
+                        continue;
                     }
-                } catch (\Exception $e) {
-                    Log::error('Error processing ticket #' . $ticket->id . ': ' . $e->getMessage());
+
+                    // Recheck under a row lock so overlapping runs cannot escalate twice.
+                    $changed = DB::transaction(function () use ($ticket, $sla) {
+                        $current = Ticket::whereKey($ticket->id)->lockForUpdate()->first();
+                        if (!$current || !$sla->shouldEscalate($current)) return null;
+                        $next = $this->getNextAssignee((int) $current->assigned_to);
+                        if (!$next) {
+                            Log::warning('No next reporting manager for overdue ticket.', ['ticket_id' => $current->id]);
+                            return null;
+                        }
+                        $previous = $current->assigned_to;
+                        $current->prev_assigned = $previous;
+                        $current->assigned_to = $next;
+                        $current->current_level = (int) ($current->current_level ?? 1) + 1;
+                        $current->escalation_time_start = now();
+                        $current->save();
+                        TicketTimeline::create([
+                            'ticket_id' => $current->id,
+                            'assign_to' => $next,
+                            'assign_time' => now(),
+                            'assign_type' => 'By Auto Escalation',
+                        ]);
+                        return $current;
+                    }, 3);
+
+                    if ($changed) {
+                        $escalated++;
+                        $this->info('Ticket #'.$changed->id.' escalated to user #'.$changed->assigned_to.'.');
+                        Log::info('Ticket escalated after first-response SLA breach.', ['ticket_id' => $changed->id, 'assigned_to' => $changed->assigned_to]);
+                        // Notification failures must not roll back or repeat a successful escalation.
+                        try {
+                            User::find($changed->assigned_to)?->notify(new TicketEscalated([
+                                'id' => $changed->assigned_to,
+                                'ticket_id' => $changed->id,
+                            ]));
+                        } catch (Throwable $exception) {
+                            Log::error('Ticket escalated, but notification failed.', ['ticket_id' => $changed->id, 'error' => $exception->getMessage()]);
+                        }
+                    }
+                } catch (Throwable $exception) {
+                    $failures++;
+                    Log::error('Ticket first-response escalation check failed.', ['ticket_id' => $ticket->id, 'error' => $exception->getMessage()]);
+                    $this->error('Ticket #'.$ticket->id.' could not be checked: '.$exception->getMessage());
                 }
             }
-        } catch (\Exception $e) {
-            Log::error('Error in handle method: ' . $e->getMessage());
-        }
+        });
+        $this->info(($dryRun ? 'Dry run: ' : '').'Checked '.$checked.' Open ticket(s); escalated '.$escalated.'.');
+        return $failures ? self::FAILURE : self::SUCCESS;
     }
 
-    /**
-     * Check if the current time is within working hours.
-     */
-    protected function isWorkingTime()
+    protected function getNextAssignee(int $userId): ?int
     {
-        try {
-            $now = Carbon::now();
-            $businessHours = BusinessHours::find(2); // Make sure this ID exists
-
-            // Check if the businessHours record was found
-            if (!$businessHours) {
-                $this->info('Error: Business hours not found with ID 2.');
-                return false;
-            }
-
-            // Log the business hours info for debugging
-            $this->info('Business hours record found: ' . $businessHours->id);
-
-            // Fetch the working days
-            $workingDays = $businessHours->getWorkingDays();
-            $currentDay = strtolower($now->format('l'));
-            $currentTime = $now->format('H:i');
-            $dayTimes = $businessHours->getStartEndTimesForDay($currentDay);
-
-            // Check if today is a working day
-            if (!in_array($currentDay, $workingDays)) {
-                $this->info('Error: Today is not a working day (' . $currentDay . ').');
-                return false;
-            }
-
-            // Check if the current time is within working hours
-            if (!($currentTime >= $dayTimes['start'] && $currentTime <= $dayTimes['end'])) {
-                $this->info('Error: Current time (' . $currentTime . ') is outside of working hours.');
-                return false;
-            }
-
-            // If everything passes, return true
-            return true;
-        } catch (\Exception $e) {
-            // Log the exception details for debugging
-            $this->info('Exception caught in isWorkingTime: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Escalate the ticket to the next level.
-     */
-    protected function escalateTicket($ticket)
-    {
-       
-        $nextLevel = $ticket->current_level + 1;
-
-        try {
-            $nextAssignee = $this->getNextAssignee($ticket->assigned_to);
-            // $this->info('Employee == : ' . $nextAssignee);
-            if ($nextAssignee) {
-                // $this->info('Rafay ');
-                $ticket->prev_assigned = $ticket->assigned_to;
-                $ticket->current_level = $nextLevel;
-                $ticket->assigned_to = $nextAssignee;
-                $ticket->escalation_time_start = Carbon::now();
-                $ticket->save();
-                $userData = [
-                    'id' => $ticket->assigned_to,
-                    'ticket_id' => $ticket->id, // Assuming you have the ticket ID available here
-                ];
-                $assignedUser = User::find($ticket->assigned_to);
-                $assignedUser->notify(new TicketEscalated($userData));
-
-             
-                // Log success
-                Log::info('Ticket #' . $ticket->id . ' escalated to user #' . $nextAssignee->user_id);
-            } else {
-                Log::warning('No next assignee found for ticket #' . $ticket->id);
-            }
-        } catch (\Exception $e) {
-            Log::error('Error escalating ticket #' . $ticket->id . ': ' . $e->getMessage());
-        }
-    }
-   
-   
-    protected function getNextAssignee($_id)
-    {
-        try {
-            $employee = Employee::where('user_id', $_id)->first();
-            // $this->info('Employee: ' . $employee->report_to);
-          
-            if (!$employee) {
-                $this->info('Employee not found with id: ' . $_id);
-                return null;
-            }
-
-            $next_assign = $employee->report_to;
-
-            if (!$next_assign) {
-                $this->info('Next assignee not found for report_to id: ' . $employee);
-                return null;
-
-            } else {
-                $nextAssignee = Employee::where('employee_id', $next_assign)->first();
-                $sending_id = $nextAssignee->user_id;
-            }
-            // $this->info('Sending id: ' . $sending_id);
-            if (!$nextAssignee) {
-               $this->info('Next assignee not found for report_to id: ' . $next_assign);
-                return null;
-            }
-
-            return $sending_id;
-        } catch (\Exception $e) {
-            $this->info('Error in getNextAssignee: ' . $e->getMessage());
-            return null;
-        }
+        $employee = Employee::where('user_id', $userId)->first();
+        if (!$employee || !$employee->report_to) return null;
+        $manager = Employee::where('employee_id', $employee->report_to)->first();
+        if (!$manager || !$manager->user_id || (int) $manager->user_id === $userId) return null;
+        return User::whereKey($manager->user_id)->exists() ? (int) $manager->user_id : null;
     }
 }

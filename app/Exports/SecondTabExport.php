@@ -17,7 +17,7 @@ class SecondTabExport implements FromArray
     {
         $data = [];
         // Define the headers for the first sheet
-        $data[] = ['Sr #', 'Ticket Type', 'Ticket Subtype', 'Open', 'Closed', 'In Progress', 'Feedback'];
+        $data[] = ['Sr #', 'Ticket Type', 'Ticket Category', 'Ticket Sub-Category', 'Open', 'Closed', 'In Progress', 'Feedback'];
         ;
         $count = 1;
         // Add data rows for the first tab
@@ -25,6 +25,7 @@ class SecondTabExport implements FromArray
             $data[] = [
                 $count,
                 $ticket->tickettype->name,
+                $ticket->ticket_category_name ?? 'Not assigned',
                 $ticket->ticketsubtype->name,
                 $ticket->open_count,
                 $ticket->closed_count,

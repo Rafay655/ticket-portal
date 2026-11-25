@@ -44,8 +44,7 @@
                         <thead>
                             <tr>
                                 <th>Priority</th>
-                                <th>First response time</th>
-                                <th>Resolution time</th>
+                                <th>First response time (minutes)</th>
                                 <th>Operational hours</th>
                                 <th>Escalation</th>
                             </tr>
@@ -69,8 +68,7 @@
                             @endphp
                             <tr>
                                 <td><span class="badge {{$badge_class}}">{{$priority->priority}}</span></td>
-                                <td><input type="text" name="{{strtolower($priority->priority)}}_first_response_time" value="{{ $slapolicy->{strtolower($priority->priority)."_first_response_time"} }}" class="form-control" placeholder="10m"></td>
-                                <td><input type="text" name="{{strtolower($priority->priority)}}_resolution_time" value="{{ $slapolicy->{strtolower($priority->priority)."_resolution_time"} }}" class="form-control" placeholder="10m"></td>
+                                <td><input type="number" min="1" step="1" required name="{{strtolower($priority->priority)}}_first_response_time" value="{{ $slapolicy->{strtolower($priority->priority)."_first_response_time"} }}" class="form-control" placeholder="200"></td>
                                 <td>
                                     <select name="{{strtolower($priority->priority)}}_operational_hours" class="form-select">
                                         <option value="business_hours" selected>Business hours</option>

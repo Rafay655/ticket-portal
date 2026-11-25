@@ -19,6 +19,15 @@ class CommentAddedNotification extends Notification
     public function __construct($userData)
     {
         $this->userData = (array) $userData;
+        if (is_array($this->userData['comment'] ?? null)) {
+            $comment = $this->userData['comment'];
+            $this->userData['comment'] = [
+                'comment' => $comment['comment'] ?? null,
+                'comment_attachment' => $comment['comment_attachment'] ?? null,
+                'voice_note_path' => $comment['voice_note_path'] ?? null,
+                'has_voice_note' => !empty($comment['voice_note_path']) || !empty($comment['voice_note']),
+            ];
+        }
     }
 
     public function via(object $notifiable): array
@@ -48,7 +57,7 @@ class CommentAddedNotification extends Notification
         $ticket = Ticket::with('ticketsubtype')->find($this->userData['ticket_id']);
 
         // Safely encode comment and any array-type values
-        $commentValue = $this->userData['comment'] ?? '';
+        $commentValue = $this->notificationComment();
         if (is_array($commentValue)) {
             $commentValue = json_encode($commentValue, JSON_UNESCAPED_UNICODE);
         }
@@ -79,7 +88,7 @@ class CommentAddedNotification extends Notification
         $name   = $ticket?->ticketsubtype?->name;
 
         // comment text (safe, handle array)
-        $commentValue = $this->userData['comment'] ?? '';
+        $commentValue = $this->notificationComment(250);
         if (is_array($commentValue)) {
             $commentValue = json_encode($commentValue, JSON_UNESCAPED_UNICODE);
         }
@@ -108,6 +117,18 @@ class CommentAddedNotification extends Notification
                 'bigPicture'     => null,
                 // 'profilePicture' => $notifiable->avatar_url ?? null,
             ],
+        ];
+    }
+
+    private function notificationComment(int $limit = 1000): array|string
+    {
+        $comment = $this->userData['comment'] ?? '';
+        if (!is_array($comment)) return \Illuminate\Support\Str::limit((string) $comment, $limit);
+        return [
+            'comment' => \Illuminate\Support\Str::limit((string) ($comment['comment'] ?? ''), $limit),
+            'comment_attachment' => \Illuminate\Support\Str::limit((string) ($comment['comment_attachment'] ?? ''), 255),
+            'voice_note_path' => \Illuminate\Support\Str::limit((string) ($comment['voice_note_path'] ?? ''), 255),
+            'has_voice_note' => (bool) ($comment['has_voice_note'] ?? false),
         ];
     }
 

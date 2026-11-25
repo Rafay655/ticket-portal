@@ -1,0 +1,1373 @@
+[
+  {
+    "method": "POST",
+    "uri": "api/login",
+    "folder": "Legacy Authentication",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::authUserLogin"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "password"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/register",
+    "folder": "Legacy Authentication",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::registerUser",
+      "app/Http/Controllers/UserController.php::store",
+      "app/Http/Requests/StoreUserRequest.php::rules"
+    ],
+    "warnings": [
+      "Legacy wrapper passes a generic Request into a web-controller method typed as StoreUserRequest; may fail with TypeError before validation."
+    ],
+    "fields": [
+      "name",
+      "mobile",
+      "user_id",
+      "email"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/reset-password/sendlink",
+    "folder": "Legacy Authentication",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::sendResetLink",
+      "app/Http/Controllers/Auth/PasswordResetLinkController.php::store"
+    ],
+    "warnings": [],
+    "fields": [
+      "email"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/test-fcm",
+    "folder": "Diagnostics",
+    "source": [
+      "routes/api.php"
+    ],
+    "warnings": [
+      "Diagnostic route has no authentication, uses a hard-coded server-side device token, and calls sendToToken with three scalar arguments although FcmClient expects (string token, array payload). Expected to fail as written. Not executed."
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/firstlogin",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::firstlogin"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "password",
+      "device_name",
+      "redirect_url"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/login",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::login"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "password",
+      "device_name",
+      "fcm_token",
+      "platform"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/auth/qr-login",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::qrLogin"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "token",
+      "device_name",
+      "fcm_token",
+      "platform"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/send-otp",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::sendOtp"
+    ],
+    "warnings": [],
+    "fields": [
+      "email"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/verify-otp",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::verifyOtp"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "otp"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/reset-password",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::resetPassword"
+    ],
+    "warnings": [],
+    "fields": [
+      "new_password",
+      "new_password_confirmation"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/auth/me",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::me"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/logout",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::logout"
+    ],
+    "warnings": [],
+    "fields": [
+      "device_name"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/auth/me/change-password",
+    "folder": "Authentication",
+    "source": [
+      "app/Http/Controllers/Api/AuthController.php::changePassword"
+    ],
+    "warnings": [],
+    "fields": [
+      "old_password",
+      "new_password",
+      "confirm_password"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/ticket-types",
+    "folder": "Ticket Types",
+    "source": [
+      "app/Http/Controllers/Api/TicketTypeController.php::index"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/ticket-types/{ticketType}/sub-types",
+    "folder": "Ticket Types",
+    "source": [
+      "app/Http/Controllers/Api/TicketTypeController.php::subTypes"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/my",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::my"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/assigned",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::assigned"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::store"
+    ],
+    "warnings": [
+      "subject is accepted by the validator but is not in Ticket::$fillable, so the current model does not persist it."
+    ],
+    "fields": [
+      "tickettype_id",
+      "ticketsubtype_id",
+      "subject",
+      "description",
+      "ticket_attachment",
+      "ticket_category_id"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/ticket/{id}",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::showDetail"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/{ticket}/comments",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::getComments"
+    ],
+    "warnings": [
+      "per_page is read but the implementation uses get(), so this endpoint currently returns all comments without pagination."
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/{ticket}/reassign/candidates",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::candidates"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/{ticket}/reassign",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::reassign"
+    ],
+    "warnings": [],
+    "fields": [
+      "assign_to"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/{ticket}/update",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiUpdateLikeStore"
+    ],
+    "warnings": [],
+    "fields": [
+      "tickettype_id",
+      "ticket_attachment",
+      "ticketsubtype_id",
+      "description",
+      "ticket_category_id"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/{id}/reply",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiReply"
+    ],
+    "warnings": [],
+    "fields": [
+      "description",
+      "comment_attachment",
+      "voice_note"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/{id}/close",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiClose"
+    ],
+    "warnings": [],
+    "fields": [
+      "description",
+      "comment_attachment"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/tickets/{id}/feedback",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiFeedbackAdd"
+    ],
+    "warnings": [],
+    "fields": [
+      "review",
+      "rate"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/user/stats",
+    "folder": "Ticket Dashboards",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiAssignedDashboard"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/team/stats",
+    "folder": "Ticket Dashboards",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::apiAssigneeDashboard"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/{id}/requester-card",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::requesterCard"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/tickets/{id}/assignee-card",
+    "folder": "Tickets",
+    "source": [
+      "app/Http/Controllers/Api/TicketApiController.php::assigneeCard"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/notifications/register-token",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::registerFcmToken"
+    ],
+    "warnings": [],
+    "fields": [
+      "token",
+      "email"
+    ]
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/notifications/unregister-token",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::unregisterFcmToken"
+    ],
+    "warnings": [],
+    "fields": [
+      "token",
+      "email"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/notifications/push-by-email",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::pushByEmail"
+    ],
+    "warnings": [],
+    "fields": [
+      "email",
+      "title",
+      "body",
+      "image_url",
+      "extra"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/notifications",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::index"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/notifications/summary",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::summary"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/notifications/{id}/read",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::markAsRead"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/notifications/{id}/unread",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::markAsUnread"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/notifications/mark-all-read",
+    "folder": "Notifications and FCM",
+    "source": [
+      "app/Http/Controllers/Api/NotificationController.php::markAllAsRead"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "PATCH",
+    "uri": "api/me/profile",
+    "folder": "Profile and Team",
+    "source": [
+      "app/Http/Controllers/Api/MeController.php::update"
+    ],
+    "warnings": [
+      "Both PATCH and POST are registered. For file uploads, use the POST variant to ensure PHP receives multipart files."
+    ],
+    "fields": [
+      "name",
+      "mobile",
+      "email",
+      "secondary_email",
+      "date_of_birth",
+      "gender",
+      "picture"
+    ]
+  },
+  {
+    "method": "POST",
+    "uri": "api/me/profile",
+    "folder": "Profile and Team",
+    "source": [
+      "app/Http/Controllers/Api/MeController.php::update"
+    ],
+    "warnings": [
+      "Both PATCH and POST are registered. For file uploads, use the POST variant to ensure PHP receives multipart files."
+    ],
+    "fields": [
+      "name",
+      "mobile",
+      "email",
+      "secondary_email",
+      "date_of_birth",
+      "gender",
+      "picture"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/me",
+    "folder": "Profile and Team",
+    "source": [
+      "app/Http/Controllers/Api/MeController.php::show"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/profile/image",
+    "folder": "Profile and Team",
+    "source": [
+      "app/Http/Controllers/Api/MeController.php::updateImage"
+    ],
+    "warnings": [],
+    "fields": [
+      "image"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/me/team",
+    "folder": "Profile and Team",
+    "source": [
+      "app/Http/Controllers/Api/MeController.php::myTeam"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/user/{user_id}/update",
+    "folder": "Legacy v1 / User",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::update",
+      "app/Http/Controllers/UserController.php::update"
+    ],
+    "warnings": [
+      "Delegates to UserController::update, which returns a web redirect rather than JSON. No API-specific validation is defined in that method."
+    ],
+    "fields": [
+      "name",
+      "email",
+      "mobile",
+      "password",
+      "roles",
+      "image"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/user",
+    "folder": "Legacy v1 / User",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::show"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/users",
+    "folder": "Legacy v1 / Users",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::index",
+      "app/Http/Controllers/UserController.php::index"
+    ],
+    "warnings": [
+      "Delegates to UserController::index, which returns a view; legacy wrapper then treats it as an Eloquent query."
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/user/roles",
+    "folder": "Legacy v1 / User",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::showRoles"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/user/change_password",
+    "folder": "Legacy v1 / User",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::changePassword"
+    ],
+    "warnings": [],
+    "fields": [
+      "user_id",
+      "password",
+      "password_confirmation"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/meta-data",
+    "folder": "Legacy v1 / Meta-Data",
+    "source": [
+      "app/Http/Controllers/Api/MetaDataApiController.php::index"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/hazards",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/hazards/create",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/hazards/{hazard_id}/show",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/hazards/{hazard_id}/update",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/hazards/{hazard_id}/assign",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::assign"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/hazards/{hazard_id}/delete",
+    "folder": "Legacy v1 / Hazards",
+    "source": [
+      "app/Http/Controllers/Api/HazardApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\HazardController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/unsafe_behaviors",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/unsafe_behaviors/create",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/show",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/update",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/assign",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::assign"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/delete",
+    "folder": "Legacy v1 / Unsafe Behaviors",
+    "source": [
+      "app/Http/Controllers/Api/UnsafeBehaviorApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\UnsafeBehaviorController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/near_misses",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/near_misses/create",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/near_misses/{near_miss_id}/show",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/near_misses/{near_miss_id}/update",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/near_misses/{near_miss_id}/assign",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::assign"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/near_misses/{near_miss_id}/delete",
+    "folder": "Legacy v1 / Near Misses",
+    "source": [
+      "app/Http/Controllers/Api/NearMissApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NearMissController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/fpdamages",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/fpdamages/create",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/fpdamages/{fpdamage_id}/show",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/fpdamages/{fpdamage_id}/update",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/fpdamages/{fpdamage_id}/assign",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::assign"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/fpdamages/{fpdamage_id}/delete",
+    "folder": "Legacy v1 / Fpdamages",
+    "source": [
+      "app/Http/Controllers/Api/FirePropertyDamageApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\FirePropertyDamageController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/injuries",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/injuries/create",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/injuries/{injury_id}/show",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/injuries/{injury_id}/update",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/injuries/{injury_id}/assign",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::assign"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/injuries/{injury_id}/delete",
+    "folder": "Legacy v1 / Injuries",
+    "source": [
+      "app/Http/Controllers/Api/InjuryApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InjuryController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ptws",
+    "folder": "Legacy v1 / Ptws",
+    "source": [
+      "app/Http/Controllers/Api/PermitToWorkApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\PermitToWorkController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ptws/create",
+    "folder": "Legacy v1 / Ptws",
+    "source": [
+      "app/Http/Controllers/Api/PermitToWorkApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\PermitToWorkController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ptws/{ptw_id}/show",
+    "folder": "Legacy v1 / Ptws",
+    "source": [
+      "app/Http/Controllers/Api/PermitToWorkApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\PermitToWorkController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ptws/{ptw_id}/update",
+    "folder": "Legacy v1 / Ptws",
+    "source": [
+      "app/Http/Controllers/Api/PermitToWorkApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\PermitToWorkController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/ptws/{ptw_id}/delete",
+    "folder": "Legacy v1 / Ptws",
+    "source": [
+      "app/Http/Controllers/Api/PermitToWorkApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\PermitToWorkController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ie_audits",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditClauseController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ie_audits/create",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::store"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditClauseController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ie_audits/{ie_audit_id}/show",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::show"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditClauseController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ie_audits/{ie_audit_id}/update",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditClauseController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/ie_audits/{ie_audit_id}/delete",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditClauseController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ie_audits/answers",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::getAnswers"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditAnswerController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/ie_audits/questions",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::getQuestions"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditQuestionController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/line_chart",
+    "folder": "Legacy v1 / Line Chart",
+    "source": [
+      "app/Http/Controllers/Api/ChartApiController.php::line_chart"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\LineChartController::index"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/line_chart/all_timelines",
+    "folder": "Legacy v1 / Line Chart",
+    "source": [
+      "app/Http/Controllers/Api/ChartApiController.php::indexAllTimeLines"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\LineChartController::prepareForLineChart"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/card_chart",
+    "folder": "Legacy v1 / Card Chart",
+    "source": [
+      "app/Http/Controllers/Api/ChartApiController.php::card_chart"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\CardChartController::index"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/card_chart/all_timelines",
+    "folder": "Legacy v1 / Card Chart",
+    "source": [
+      "app/Http/Controllers/Api/ChartApiController.php::piChartAllTimeLines"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\CardChartController::prepareForPiChart"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/bar_charts",
+    "folder": "Legacy v1 / Bar Charts",
+    "source": [
+      "app/Http/Controllers/Api/ChartApiController.php::barCharts"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\BarChartController::prepareForBarChart"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/statistics",
+    "folder": "Legacy v1 / Statistics",
+    "source": [
+      "app/Http/Controllers/Api/DataStatsApiController.php::index",
+      "app/Http/Controllers/DataStatsController.php::index"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/statistics/summary",
+    "folder": "Legacy v1 / Statistics",
+    "source": [
+      "app/Http/Controllers/Api/DataStatsApiController.php::summary",
+      "app/Http/Controllers/DataStatsController.php::summary"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ie_audits/answers/submit",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::submitAnswer"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditAnswerController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/ie_audits/answers/{answer_id}/update",
+    "folder": "Legacy v1 / Ie Audits",
+    "source": [
+      "app/Http/Controllers/Api/IEAuditClauseApiController.php::updateAnswer"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\InternalExternalAuditAnswerController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/incidents",
+    "folder": "Legacy v1 / Incidents",
+    "source": [
+      "app/Http/Controllers/Api/IncidentApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\IncidentController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/incident_assign",
+    "folder": "Legacy v1 / Incident Assign",
+    "source": [
+      "app/Http/Controllers/Api/IncidentAsssignApiController.php::storeByIncidentName"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\IncidentAssignController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/incident_assign/reject",
+    "folder": "Legacy v1 / Incident Assign",
+    "source": [
+      "app/Http/Controllers/Api/IncidentAsssignApiController.php::rejectIncidentByName"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\IncidentAssignController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/incident_assign/{incident_assign_id}/update",
+    "folder": "Legacy v1 / Incident Assign",
+    "source": [
+      "app/Http/Controllers/Api/IncidentAsssignApiController.php::update"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\IncidentAssignController"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/reset-password",
+    "folder": "Legacy v1 / Reset-Password",
+    "source": [
+      "app/Http/Controllers/Api/UserApiController.php::resetPasword",
+      "app/Http/Controllers/Auth/NewPasswordController.php::store"
+    ],
+    "warnings": [],
+    "fields": [
+      "token",
+      "email",
+      "password",
+      "password_confirmation"
+    ]
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/notifications",
+    "folder": "Legacy v1 / Notifications",
+    "source": [
+      "app/Http/Controllers/Api/NotificationApiController.php::index"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NotificationController::index"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/notifications",
+    "folder": "Legacy v1 / Notifications",
+    "source": [
+      "app/Http/Controllers/Api/NotificationApiController.php::activitySeen"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\NotificationController::activitySeen"
+    ],
+    "fields": []
+  },
+  {
+    "method": "POST",
+    "uri": "api/v1/reports/generate",
+    "folder": "Legacy v1 / Reports",
+    "source": [
+      "app/Http/Controllers/Api/ReportApiController.php::createReport"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\ReportController::createReport"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/v1/reports",
+    "folder": "Legacy v1 / Reports",
+    "source": [
+      "app/Http/Controllers/Api/ReportApiController.php::index",
+      "app/Http/Controllers/ReportController.php::index"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "DELETE",
+    "uri": "api/v1/reports/{report_id}/delete",
+    "folder": "Legacy v1 / Reports",
+    "source": [
+      "app/Http/Controllers/Api/ReportApiController.php::destroy"
+    ],
+    "warnings": [
+      "Unavailable handler/dependency: App\\Http\\Controllers\\ReportController::destroy"
+    ],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/ticket-types/{ticketType}/categories",
+    "folder": "Ticket Types",
+    "source": [
+      "app/Http/Controllers/Api/TicketTypeController.php::categories"
+    ],
+    "warnings": [],
+    "fields": []
+  },
+  {
+    "method": "GET",
+    "uri": "api/ticket-categories/{ticketCategory}/sub-categories",
+    "folder": "Ticket Types",
+    "source": [
+      "app/Http/Controllers/Api/TicketTypeController.php::categorySubCategories"
+    ],
+    "warnings": [],
+    "fields": []
+  }
+]

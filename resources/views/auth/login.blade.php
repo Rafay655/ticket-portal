@@ -1,6 +1,5 @@
 <x-guest-layout>
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
     <img src="{{ asset('website/img/logo.png') }}" alt="HRPSP Logo" class="mb-4 mx-auto" style="width: 150px;">
     <div class=" mb-5">
         <h2 class="fw-bold " style="font-size:26px">Login using <span class="text-primary">email.</span></h2>

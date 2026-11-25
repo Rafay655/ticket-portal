@@ -13,10 +13,10 @@
       </a>
     </li>
     <li class="breadcrumb-item text-sm text-white active">
-      <a class="opacity-5 text-white" href="javascript:;">Ticket Sub Type List</a>
+      <a class="opacity-5 text-white" href="javascript:;">Ticket Sub-Category List</a>
     </li>
   </ol>
-  <h6 class="font-weight-bolder mb-0 text-white">Ticket Sub Type List</h6>
+  <h6 class="font-weight-bolder mb-0 text-white">Ticket Sub-Category List</h6>
 </nav>
 @endsection
 
@@ -29,8 +29,8 @@
       <div class="card-header bg-white-custom pb-0">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h5 class="mb-0">Ticket Sub Types</h5>
-            <p class="text-sm mb-0">List of Ticket Sub Types</p>
+            <h5 class="mb-0">Ticket Sub-Categories</h5>
+            <p class="text-sm mb-0">List of Ticket Sub-Categories</p>
           </div>
           @can('ticketSubType.create')
           <a href="{{ route('ticketsubtypes.create') }}" class="btn bg-gradient-primary btn-sm mb-0">+&nbsp; Add New</a>
@@ -38,32 +38,17 @@
         </div>
       </div>
 
-      <!-- Controls Row -->
-      <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-bottom: 1px solid #ddd;">
-        <!-- Per Page Dropdown -->
-        <form method="GET" action="{{ route('ticketsubtypes.index') }}" style="width:200px;" class="d-flex align-items-center">
-          <label for="perpage" class="me-2" style="min-width: 70px; font-weight: 500;">Per Page:</label>
-          <select name="perpage" id="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
-            <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
-            <option value="20" {{ $perPage == 20 ? 'selected' : '' }}>20</option>
-            <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-          </select>
-        </form>
-
-        <!-- Search Bar -->
-        <div style="width: 250px;">
-          <input type="text" id="search-bar" placeholder="Search Ticket Sub Types..." class="form-control form-control-sm">
-        </div>
-      </div>
+      @include('listings.filters', ['listingLabel' => 'Ticket Sub-Categories'])
 
       <!-- Table -->
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="ticketsubtypes-table">
+        <table data-serial-offset="{{ max(0, ($ticketsubtypes->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="ticketsubtypes-table">
           <thead class="thead-light">
             <tr>
-              <th>Sr#</th>
+              <th data-serial-column>Sr#</th>
               <th>Name</th>
+              <th>Ticket Type</th>
+              <th>Ticket Category</th>
               <th>Priority</th>
               @canany(['ticketSubType.edit', 'ticketSubType.delete'])
               <th>Action</th>
@@ -73,8 +58,10 @@
           <tbody>
             @foreach($ticketsubtypes as $ticketsubtype)
             <tr>
-              <td>{{ $loop->iteration }}</td>
+              <td>{{ ($ticketsubtypes->firstItem() ?? 1) + $loop->index }}</td>
               <td>{{ $ticketsubtype->name ?? "-" }}</td>
+              <td>{{ $ticketsubtype->category?->ticketType?->name ?? "Not assigned" }}</td>
+              <td>{{ $ticketsubtype->category?->name ?? "Not assigned" }}</td>
               <td>{{ $ticketsubtype->priority ?? "-" }}</td>
               @canany(['ticketSubType.edit', 'ticketSubType.delete'])
               <td>
@@ -86,7 +73,7 @@
                   @endcan
                   @can('ticketSubType.delete')
                   <x-forms.action-btn href="" id="table_data_delete" action="delete"
-                                                title="delete ticket sub type"
+                                                title="delete ticket sub-category"
                                                 data-action="{{route('ticketsubtypes.destroy', $ticketsubtype['id'])}}"
                                                 data-parent="tr"></x-forms.action-btn>
                   @endcan
@@ -120,15 +107,16 @@
   $(document).ready(function () {
     // Enable DataTables
     let table = $('#ticketsubtypes-table').DataTable({
+      serverSide: false,
+      searching: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging: false, // Disable DataTables pagination to use Laravel's
       ordering: true, // Enable column sorting
       info: false // Disable DataTables info to use Laravel's pagination
     });
 
     // Add search functionality to the custom search bar
-    $('#search-bar').on('keyup', function () {
-      table.search(this.value).draw();
-    });
   });
 </script>
 @endsection

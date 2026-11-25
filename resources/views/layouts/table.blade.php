@@ -20,7 +20,6 @@
    {{-- @include('layouts.partials.dashboard') --}}
    {{-- main conetns ends here --}}
   </main>
-  @include('layouts.partials.ui_change')
   <!--   Core JS Files   -->
   @include('layouts.partials.core_script')
   @yield('script')

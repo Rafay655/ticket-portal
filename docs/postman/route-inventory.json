@@ -1,0 +1,1210 @@
+[
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/login",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "authUserLogin"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/register",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "registerUser"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/reset-password/sendlink",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "sendResetLink"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/test-fcm",
+    "middleware": [],
+    "controller": null,
+    "action": "closure"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/firstlogin",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "firstlogin"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/login",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "login"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/auth/qr-login",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "qrLogin"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/send-otp",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "sendOtp"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/verify-otp",
+    "middleware": [],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "verifyOtp"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/reset-password",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "resetPassword"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/auth/me",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "me"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/logout",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "logout"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/auth/me/change-password",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\AuthController",
+    "action": "changePassword"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/ticket-types",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketTypeController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/ticket-types/{ticketType}/sub-types",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketTypeController",
+    "action": "subTypes"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/my",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "my"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/assigned",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "assigned"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/ticket/{id}",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "showDetail"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/{ticket}/comments",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "getComments"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/{ticket}/reassign/candidates",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "candidates"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/{ticket}/reassign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "reassign"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/{ticket}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiUpdateLikeStore"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/{id}/reply",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiReply"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/{id}/close",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiClose"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/tickets/{id}/feedback",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiFeedbackAdd"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/user/stats",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiAssignedDashboard"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/team/stats",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "apiAssigneeDashboard"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/{id}/requester-card",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "requesterCard"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/tickets/{id}/assignee-card",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketApiController",
+    "action": "assigneeCard"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/notifications/register-token",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "registerFcmToken"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/notifications/unregister-token",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "unregisterFcmToken"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/notifications/push-by-email",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "pushByEmail"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/notifications",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/notifications/summary",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "summary"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/notifications/{id}/read",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "markAsRead"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/notifications/{id}/unread",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "markAsUnread"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/notifications/mark-all-read",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationController",
+    "action": "markAllAsRead"
+  },
+  {
+    "methods": [
+      "PATCH",
+      "POST"
+    ],
+    "uri": "api/me/profile",
+    "middleware": [
+      "auth:sanctum",
+      "throttle:10,1"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\MeController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/me",
+    "middleware": [
+      "auth:sanctum",
+      "throttle:10,1"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\MeController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/profile/image",
+    "middleware": [
+      "auth:sanctum",
+      "throttle:10,1"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\MeController",
+    "action": "updateImage"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/me/team",
+    "middleware": [
+      "auth:sanctum",
+      "throttle:10,1"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\MeController",
+    "action": "myTeam"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/user/{user_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/user",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/users",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/user/roles",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "showRoles"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/user/change_password",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "changePassword"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/meta-data",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\MetaDataApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/hazards",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/hazards/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/hazards/{hazard_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/hazards/{hazard_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/hazards/{hazard_id}/assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "assign"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/hazards/{hazard_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\HazardApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/unsafe_behaviors",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/unsafe_behaviors/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "assign"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/unsafe_behaviors/{unsafe_behavior_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UnsafeBehaviorApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/near_misses",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/near_misses/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/near_misses/{near_miss_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/near_misses/{near_miss_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/near_misses/{near_miss_id}/assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "assign"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/near_misses/{near_miss_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NearMissApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/fpdamages",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/fpdamages/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/fpdamages/{fpdamage_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/fpdamages/{fpdamage_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/fpdamages/{fpdamage_id}/assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "assign"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/fpdamages/{fpdamage_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\FirePropertyDamageApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/injuries",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/injuries/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/injuries/{injury_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/injuries/{injury_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/injuries/{injury_id}/assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "assign"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/injuries/{injury_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\InjuryApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ptws",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\PermitToWorkApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ptws/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\PermitToWorkApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ptws/{ptw_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\PermitToWorkApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ptws/{ptw_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\PermitToWorkApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/ptws/{ptw_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\PermitToWorkApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ie_audits",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ie_audits/create",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "store"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ie_audits/{ie_audit_id}/show",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "show"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ie_audits/{ie_audit_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/ie_audits/{ie_audit_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ie_audits/answers",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "getAnswers"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/ie_audits/questions",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "getQuestions"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/line_chart",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ChartApiController",
+    "action": "line_chart"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/line_chart/all_timelines",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ChartApiController",
+    "action": "indexAllTimeLines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/card_chart",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ChartApiController",
+    "action": "card_chart"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/card_chart/all_timelines",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ChartApiController",
+    "action": "piChartAllTimeLines"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/bar_charts",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ChartApiController",
+    "action": "barCharts"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/statistics",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\DataStatsApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/statistics/summary",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\DataStatsApiController",
+    "action": "summary"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ie_audits/answers/submit",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "submitAnswer"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/ie_audits/answers/{answer_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IEAuditClauseApiController",
+    "action": "updateAnswer"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/incidents",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IncidentApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/incident_assign",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IncidentAsssignApiController",
+    "action": "storeByIncidentName"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/incident_assign/reject",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IncidentAsssignApiController",
+    "action": "rejectIncidentByName"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/incident_assign/{incident_assign_id}/update",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\IncidentAsssignApiController",
+    "action": "update"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/reset-password",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\UserApiController",
+    "action": "resetPasword"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/notifications",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/notifications",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\NotificationApiController",
+    "action": "activitySeen"
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "api/v1/reports/generate",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ReportApiController",
+    "action": "createReport"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/v1/reports",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ReportApiController",
+    "action": "index"
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "api/v1/reports/{report_id}/delete",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\ReportApiController",
+    "action": "destroy"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/ticket-types/{ticketType}/categories",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketTypeController",
+    "action": "categories"
+  },
+  {
+    "methods": [
+      "GET"
+    ],
+    "uri": "api/ticket-categories/{ticketCategory}/sub-categories",
+    "middleware": [
+      "auth:sanctum"
+    ],
+    "controller": "App\\Http\\Controllers\\Api\\TicketTypeController",
+    "action": "categorySubCategories"
+  }
+]

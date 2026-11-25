@@ -42,7 +42,7 @@
                   onchange="this.form.submit()">
             @foreach(['5','10','20','50','all'] as $opt)
               <option value="{{ $opt }}"
-                      {{ request('perpage') == $opt ? 'selected':'' }}>
+                      {{ request('perpage', '10') == $opt ? 'selected':'' }}>
                 {{ $opt === 'all' ? 'All' : $opt }}
               </option>
             @endforeach
@@ -64,21 +64,23 @@
           <input type="text"
                  name="search"
                  value="{{ $search }}"
-                 placeholder="Type, Subtype, User, Status..."
+                 placeholder="ID, Description, Category, User, Status..."
                  class="form-control form-control-sm me-2"
                  onkeydown="if(event.key==='Enter'){ this.form.submit(); }">
           <button type="submit" class="btn btn-sm btn-primary">Search</button>
+          <a href="{{ url()->current() }}" class="btn btn-sm btn-outline-secondary ms-2">Reset</a>
         </div>
       </form>
 
       {{-- Table --}}
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="tickets-table">
+        <table data-serial-offset="{{ max(0, ($tickets->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="tickets-table">
           <thead class="thead-light">
             <tr>
-              <th>#</th>
+              <th data-serial-column>Sr#</th>
               <th>Ticket Type</th>
-              <th>Ticket Subtype</th>
+                  <th>Ticket Category</th>
+              <th>Ticket Sub-Category</th>
               <th>Comments</th>
               <th>Requested By</th>
               <th>Assign To</th>
@@ -93,6 +95,7 @@
             <tr>
               <td>{{ $tickets->firstItem() + $loop->index }}</td>
               <td>{{ $ticket->tickettype->name }}</td>
+                  <td>{{ $ticket->ticket_category_name ?? 'Not assigned' }}</td>
               <td>{{ $ticket->ticketsubtype->name ?? 'N/A' }}</td>
               <td>{{ $ticket->comments->count() }}</td>
               <td>{{ $ticket->requestedby->name }}</td>
@@ -119,7 +122,7 @@
       {{-- Pagination --}}
       <div class="d-flex justify-content-between align-items-center px-4 py-3">
         {{ $tickets
-            ->appends(['perpage'=>request('perpage'),'search'=>request('search')])
+            ->appends(['perpage'=>request('perpage', '10'),'search'=>request('search')])
             ->links('pagination::bootstrap-4') }}
       </div>
 
@@ -132,6 +135,9 @@
 <script>
   $(document).ready(function(){
     $('#tickets-table').DataTable({
+      serverSide: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging:   false,
       ordering: true,
       info:     false,

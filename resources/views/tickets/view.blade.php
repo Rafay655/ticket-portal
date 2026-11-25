@@ -86,7 +86,7 @@
 			<div class="bg-white-unique pt-3 h-100 d-flex flex-column  lightborder-unique">
 
 				<div class="d-flex px-3 pb-3 justify-content-between align-items-center border-bottom ">
-					<h5 class="mb-0 ">Ticket View</h5>
+					<div><h5 class="mb-0">Ticket View</h5><p class="text-sm mb-0">{{ $ticket->tickettype?->name }} / {{ $ticket->ticket_category_name ?? 'Not assigned' }} / {{ $ticket->ticketsubtype?->name }}</p></div>
 					@if($ticket->status == "Open" || $ticket->status == 'in_progress')
 						<div class="d-flex">
 						    @if(auth()->user()->id == $ticket->assigned_to || auth()->user()->id == $ticket->requested_by )
@@ -162,8 +162,7 @@
 
 												<audio controls>
 													<source
-														src="{{ asset('comment_attachment/audios/' . $comment->voice_note_path) }}"
-														type="audio/mpeg">
+														src="{{ asset('comment_attachment/audios/' . $comment->voice_note_path) }}">
 													Your browser does not support the audio element.
 												</audio>
 											</div>
@@ -181,7 +180,7 @@
 
 				@if($ticket->status == "Open" || $ticket->status == "in_progress")
 					<div class="border-top p-3 d-none w-100" id="commentForm">
-						<form action="{{ route('comment.add') }}" method="POST" enctype="multipart/form-data" class="w-100">
+						<form action="{{ route('comment.add') }}" method="POST" enctype="multipart/form-data" class="w-100" id="ticketCommentForm">
 							@csrf
                         <input type="hidden" name="return_to" value="{{ request('return_to') }}">
 							<input type="hidden" name="ticket_id" value="{{$ticket->id}}">
@@ -357,7 +356,7 @@
 					<h5 class="modal-title" id="feedbackModalLabel">Provide Answer</h5>
 				</div>
 				<div class="modal-body">
-					<form action="{{ route('ticket.close', $ticket->id) }}" method="post">
+					<form action="{{ route('ticket.close', ['id' => $ticket->id], false) }}" method="POST" enctype="multipart/form-data" id="closeTicketForm">
 						@csrf
                         <input type="hidden" name="return_to" value="{{ request('return_to') }}">
 						<input type="hidden" name="ticket_id" value="{{$ticket->id}}">
@@ -497,5 +496,5 @@
 
 	@endsection
 	@section('script')
-	<script src="{{ asset('assets/js/ticketview.js') }}"></script>
+	<script src="{{ asset('assets/js/ticketview.js?v=20261125-recording2') }}"></script>
 	@endsection

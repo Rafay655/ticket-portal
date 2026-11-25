@@ -122,8 +122,9 @@
                     <tr>
                         <td><strong>Ticket Type:</strong> {{ $ticket->tickettype->name}}</td>
                     </tr>
+                    <tr><td><strong>Ticket Category:</strong> {{ $ticket->ticket_category_name ?? 'Not assigned' }}</td></tr>
                     <tr>
-                        <td><strong>Sub Type:</strong> {{$ticket->ticketsubtype->name}}</td>
+                        <td><strong>Ticket Sub-Category:</strong> {{$ticket->ticketsubtype->name}}</td>
                     </tr>
                     <tr>
                         <td><strong>Priority:</strong> {{$ticket->ticketsubtype->priority}}</td>

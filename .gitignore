@@ -39,7 +39,9 @@ error_log
 /bootstrap/cache/*
 !/bootstrap/cache/.gitignore
 /public/ticket_attachment/
-/public/comment_attachment/
+/public/comment_attachment/**
+!/public/comment_attachment/**/
+!/public/comment_attachment/**/.gitignore
 /public/attachements/
 /public/images/profile/
 /public/excel_temp/

@@ -15,14 +15,12 @@ class GradeController extends Controller
     public function index(Request $request)
     {
         RolesPermissionController::can(['grade.index']);
-        $perPage = $request->input('perpage', 10); // Default to 10 items per page if not specified
-        $data = [];
-        $data['grades'] = Grade::paginate($perPage)->appends(['perpage' => $perPage]); // Pagination with 'perpage'
-        $data['perPage'] = $perPage; // Current per-page value
-        return view('grades.index', $data);
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $grades = \App\Support\ListingFilters::paginate(Grade::query(), $request, ['name']);
+        return view('grades.index', compact('grades', 'perPage'));
     }
-    
-    
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -32,7 +30,7 @@ class GradeController extends Controller
         $data = [];
         return view('grades.create',$data);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
@@ -51,7 +49,7 @@ class GradeController extends Controller
     {
         //
     }
-    
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -74,7 +72,7 @@ class GradeController extends Controller
         $grade->save();
         return redirect()->route('grades.index')->with('success', 'Update successfully!');
     }
-    
+
     /**
      * Remove the specified resource from storage.
      */

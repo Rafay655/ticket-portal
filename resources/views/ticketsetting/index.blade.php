@@ -39,32 +39,17 @@
         </div>
       </div>
 
-      <!-- Controls Row -->
-      <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-bottom: 1px solid #ddd;">
-        <!-- Per Page Dropdown -->
-        <form method="GET" action="{{ route('ticketsetting.index') }}" style="width:200px;" class="d-flex align-items-center">
-          <label for="perpage" class="me-2" style="min-width: 70px; font-weight: 500;">Per Page:</label>
-          <select name="perpage" id="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
-            <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
-            <option value="20" {{ $perPage == 20 ? 'selected' : '' }}>20</option>
-            <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-          </select>
-        </form>
-
-        <!-- Search Bar -->
-        <div style="width: 250px;">
-          <input type="text" id="search-bar" placeholder="Search Ticket Settings..." class="form-control form-control-sm">
-        </div>
-      </div>
+      @include('listings.filters', ['listingLabel' => 'Ticket Settings'])
 
       <!-- Table -->
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="ticketsettings-table">
+        <table data-serial-offset="{{ max(0, ($ticketsettings->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="ticketsettings-table">
           <thead class="thead-light">
             <tr>
+              <th data-serial-column>Sr#</th>
               <th>Ticket Type</th>
-              <th>Ticket Sub Type</th>
+              <th>Ticket Category</th>
+              <th>Ticket Sub-Category</th>
               <th>Total Levels</th>
               @canany(['ticketSettings.edit', 'ticketSettings.delete'])
               <th>Action</th>
@@ -74,7 +59,9 @@
           <tbody>
             @foreach($ticketsettings as $ticketsetting)
             <tr>
+              <td>{{ ($ticketsettings->firstItem() ?? 1) + $loop->index }}</td>
               <td>{{ $ticketsetting->ticket_type->name }}</td>
+              <td>{{ $ticketsetting->ticket_sub_type?->category?->ticket_type_id == $ticketsetting->ticket_type_id ? $ticketsetting->ticket_sub_type?->category?->name : 'Not assigned' }}</td>
               <td>{{ $ticketsetting->ticket_sub_type->name }}</td>
               <td>{{ $ticketsetting->escalations->count() }}</td>
               @canany(['ticketSettings.edit', 'ticketSettings.delete'])
@@ -121,15 +108,16 @@
   $(document).ready(function () {
     // Enable DataTables
     let table = $('#ticketsettings-table').DataTable({
+      serverSide: false,
+      searching: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging: false, // Disable DataTables pagination to use Laravel's
       ordering: true, // Enable column sorting
       info: false // Disable DataTables info to use Laravel's pagination
     });
 
     // Add search functionality to the custom search bar
-    $('#search-bar').on('keyup', function () {
-      table.search(this.value).draw();
-    });
   });
 </script>
 @endsection

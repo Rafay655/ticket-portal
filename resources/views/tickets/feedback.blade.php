@@ -61,7 +61,7 @@
 								      <td>{{$ticket->tickettype->name}}</td>
 								    </tr>
 								    <tr>
-								      <th>Ticket Sub Type</th>
+								      <th>Ticket Sub-Category</th>
 								      <td>{{$ticket->ticketsubtype->name}}</td>
 								    </tr>
 								    <tr>

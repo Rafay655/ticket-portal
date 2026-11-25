@@ -33,30 +33,14 @@
         </div>
       </div>
 
-      <!-- Controls Row -->
-      <div class="d-flex justify-content-between align-items-center px-4 py-3" style="border-bottom: 1px solid #ddd;">
-        <!-- Per Page Dropdown -->
-        <form method="GET" id="perPageForm" style="width:200px;" class="d-flex align-items-center">
-          <label for="perpage" class="me-2" style="min-width: 70px; font-weight: 500;">Per Page:</label>
-          <select name="perpage" id="perpage" class="form-select form-select-sm" onchange="this.form.submit()">
-            <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
-            <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
-            <option value="20" {{ $perPage == 20 ? 'selected' : '' }}>20</option>
-            <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
-          </select>
-        </form>
-
-        <!-- Search Bar -->
-        <div style="width: 250px;">
-          <input type="text" id="search-bar" placeholder="Search Separated Employees..." class="form-control form-control-sm">
-        </div>
-      </div>
+      @include('listings.filters', ['listingLabel' => 'Separated Employees'])
 
       <!-- Table -->
       <div class="table-responsive p-3">
-        <table class="table table-striped table-hover" id="employee-separation-table">
+        <table data-serial-offset="{{ max(0, ($employeeSeparations->firstItem() ?? 1) - 1) }}" class="table table-striped table-hover" id="employee-separation-table">
           <thead class="thead-light">
             <tr>
+              <th data-serial-column>Sr#</th>
               <th>Employee ID</th>
               <th>Name</th>
               <th>Email</th>
@@ -69,6 +53,7 @@
           <tbody>
             @foreach($employeeSeparations as $employeeSeparation)
             <tr>
+              <td>{{ ($employeeSeparations->firstItem() ?? 1) + $loop->index }}</td>
               <td>{{ $employeeSeparation->employee_id }}</td>
               <td>{{ $employeeSeparation->name }}</td>
               <td>{{ $employeeSeparation->email }}</td>
@@ -99,15 +84,16 @@
   $(document).ready(function () {
     // Enable DataTables
     let table = $('#employee-separation-table').DataTable({
+      serverSide: false,
+      searching: false,
+      order: [],
+      columnDefs: [{ targets: 0, orderable: false, searchable: false }],
       paging: false, // Disable DataTables pagination to use Laravel's
       ordering: true, // Enable column sorting
       info: false // Disable DataTables info to use Laravel's pagination
     });
 
     // Add search functionality to the custom search bar
-    $('#search-bar').on('keyup', function () {
-      table.search(this.value).draw();
-    });
   });
 </script>
 @endsection

@@ -67,6 +67,13 @@ class UserRolesAndPermissionSeeder extends Seeder
             'ticketType.delete',
             'ticketType.view',
 
+            // Ticket Category Permissions
+            'ticketCategory.index',
+            'ticketCategory.create',
+            'ticketCategory.edit',
+            'ticketCategory.delete',
+            'ticketCategory.view',
+
             // Ticket SubType Permissions
             'ticketSubType.index',
             'ticketSubType.create',

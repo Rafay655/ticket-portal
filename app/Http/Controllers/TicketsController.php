@@ -9,6 +9,8 @@ use App\Models\Employee;
 use App\Models\TicketSubType;
 use App\Models\User;
 use App\Models\Ticket;
+use App\Services\TicketCreationGuard;
+use App\Services\TicketHierarchy;
 use App\Models\TicketTimeline;
 use App\Models\Comment;
 use App\Models\TicketFeedback;
@@ -37,12 +39,12 @@ public function index(Request $request, $channel = 'web')
         RolesPermissionController::can(['ticket.index']);
 
         $authUserId   = auth()->id();
-        $perPageInput = $request->input('perpage', '10');
-        $search       = $request->input('search', '');
+        $perPageInput = \App\Support\ListingFilters::perPage($request);
+        $search       = \App\Support\ListingFilters::search($request);
         $activeTab    = $request->input('tab', 'my-tickets');
 
         // Base relations
-        $with = ['tickettype', 'ticketsubtype', 'comments', 'requestedby', 'assignto'];
+        $with = ['tickettype', 'ticketsubtype.category', 'ticketCategory', 'comments', 'requestedby', 'assignto'];
 
         // My Tickets query
         $queryMy = Ticket::where('requested_by', $authUserId)->with($with);
@@ -68,27 +70,8 @@ public function index(Request $request, $channel = 'web')
             });
         }
 
-        // Apply search filter
-        if (trim($search) !== '') {
-            foreach (['queryMy','queryTeam'] as $q) {
-                $$q->where(function($q2) use ($search) {
-                    $q2->whereHas('tickettype', function($q3) use ($search) {
-                            $q3->where('name','like',"%{$search}%");
-                        })
-                        ->orWhereHas('ticketsubtype', function($q3) use ($search) {
-                            $q3->where('name','like',"%{$search}%");
-                        })
-                        ->orWhereHas('requestedby', function($q3) use ($search) {
-                            $q3->where('name','like',"%{$search}%");
-                        })
-                        ->orWhereHas('assignto', function($q3) use ($search) {
-                            $q3->where('name','like',"%{$search}%");
-                        })
-                        ->orWhere('status','like',"%{$search}%")
-                        ->orWhereDate('created_at',$search);
-                });
-            }
-        }
+        \App\Support\ListingFilters::tickets($queryMy, $request);
+        \App\Support\ListingFilters::tickets($queryTeam, $request);
 
         // Resolve per-page counts (numeric vs “all”)
         if ($perPageInput === 'all') {
@@ -100,18 +83,18 @@ public function index(Request $request, $channel = 'web')
         }
 
         // Paginate & append query params
-        $data['tickets'] = $queryMy->orderBy('created_at','desc')
+        $data['tickets'] = $queryMy->orderBy('created_at', 'desc')->orderBy('id', 'desc')
             ->paginate($perPageMy)
-        
+
             ->appends([
                 'tab'     => 'my-tickets',
                 'perpage' => $perPageInput,
                 'search'  => $search,
             ]);
 
-        $data['team'] = $queryTeam->orderBy('created_at','desc')
+        $data['team'] = $queryTeam->orderBy('created_at', 'desc')->orderBy('id', 'desc')
             ->paginate($perPageTeam)
-            
+
             ->appends([
                 'tab'     => 'team-tickets',
                 'perpage' => $perPageInput,
@@ -168,19 +151,25 @@ public function index(Request $request, $channel = 'web')
         $data = [];
         $data['tickettypes'] = TicketType::get();
         $data['ticketsubtypes'] = TicketSubType::get();
-        $data['ticketSettings'] = TicketSetting::with([
-            'ticket_sub_type:id,name',
-        ])->get();
-       
+        $data['hierarchyData'] = app(TicketHierarchy::class)->options();
+
         return view('tickets.create', $data);
     }
 
-    
+
    public function store(Request $request, $channel = "web")
     {
         RolesPermissionController::can(['ticket.create']);
-        $input = $request->all();
-     
+        $request->validate([
+            'tickettype_id' => ['required', 'integer', 'exists:ticket_types,id'],
+            'ticket_category_id' => ['required', 'integer', 'exists:ticket_categories,id'],
+            'ticketsubtype_id' => ['required', 'integer', 'exists:ticket_sub_types,id'],
+        ]);
+        $classification = app(TicketHierarchy::class)->resolve((int) $request->tickettype_id, $request->ticket_category_id, $request->ticketsubtype_id);
+        $creationGuard = app(TicketCreationGuard::class);
+        $creationGuard->assertCanCreate((int) auth()->id(), $request->input('ticketsubtype_id'));
+        $input = array_merge($request->all(), $classification);
+
         if ($request->hasFile('ticket_attachment')) {
             $fileName = time() . '.' . $request->ticket_attachment->getClientOriginalExtension();
             $request->ticket_attachment->move(public_path('ticket_attachment/files'), $fileName);
@@ -216,7 +205,7 @@ public function index(Request $request, $channel = 'web')
             // optional: distribute load if you have more than one match
             ->inRandomOrder()
             ->first();
-  
+
     if (!$poc) {
         return redirect()
             ->route('tickets.create')
@@ -249,14 +238,7 @@ else {
         $input['status'] = "Open";
         $input['current_level'] = 1;
         $input['escalation_time_start'] = Carbon::now();
-        $ticket = Ticket::create($input);
-
-        $this->ticket_time_line([
-            'ticket_id' => $ticket->id,
-            'assign_to' => $input['assigned_to'],
-            'assign_time' => date('Y-m-d H:i:s'),
-            'assign_type' => "By Create",
-        ]);
+        $ticket = $creationGuard->create($input);
 
         $assignedUser = User::find($input['assigned_to']);
         $reportingUser = auth()->user()->id;
@@ -291,6 +273,7 @@ else {
         RolesPermissionController::can(['ticket.edit']);
         $data = [];
         $data['ticket'] = $ticket;
+        $data['hierarchyData'] = app(TicketHierarchy::class)->options();
         $data['tickettypes'] = TicketType::get();
         $data['ticketsubtypes'] = TicketSubType::get();
         return view('tickets.edit', $data);
@@ -302,7 +285,12 @@ else {
     public function update(Request $request, Ticket $ticket)
     {
         RolesPermissionController::can(['ticket.edit']);
-        $input = $request->all();
+        $request->validate([
+            'tickettype_id' => ['required', 'integer', 'exists:ticket_types,id'],
+            'ticket_category_id' => ['required', 'integer', 'exists:ticket_categories,id'],
+            'ticketsubtype_id' => ['required', 'integer', 'exists:ticket_sub_types,id'],
+        ]);
+        $input = array_merge($request->all(), app(TicketHierarchy::class)->resolve((int) $request->tickettype_id, $request->ticket_category_id, $request->ticketsubtype_id));
 
         if ($request->hasFile('ticket_attachment')) {
             $fileName = time() . '.' . $request->ticket_attachment->getClientOriginalExtension();
@@ -380,31 +368,14 @@ public function tickets_assign(Request $request)
     RolesPermissionController::can(['ticket.index']);
 
     $authUserId   = auth()->id();
-    $perPageInput = $request->input('perpage', '10');
-    $search       = $request->input('search', '');
+    $perPageInput = \App\Support\ListingFilters::perPage($request);
+    $search       = \App\Support\ListingFilters::search($request);
 
     $query = Ticket::where('assigned_to', $authUserId)
-                   ->with(['tickettype','ticketsubtype','comments','requestedby','assignto']);
+                   ->with(['tickettype', 'ticketsubtype.category', 'ticketCategory','comments','requestedby','assignto']);
 
-   
-   if (trim($search) !== '') {
-    $query->where(function($q) use ($search) {
-        $q->whereHas('tickettype', function($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('ticketsubtype', function($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('requestedby', function($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhereHas('assignto', function($q2) use ($search) {
-                $q2->where('name', 'like', "%{$search}%");
-            })
-            ->orWhere('status', 'like', "%{$search}%")
-            ->orWhereDate('created_at', $search);
-    });
-}
+
+   \App\Support\ListingFilters::tickets($query, $request);
 
 
     // “All” support
@@ -416,7 +387,7 @@ public function tickets_assign(Request $request)
 
     // Final paginate & append params
     $tickets = $query
-        ->orderBy('created_at','desc')
+        ->orderBy('created_at', 'desc')->orderBy('id', 'desc')
         ->paginate($perPage)
         ->appends([
             'perpage' => $perPageInput,
@@ -468,6 +439,7 @@ public function tickets_assign(Request $request)
     {
         $ticket = Ticket::find($request->ticket_id);
         $ticket->assigned_to = $request->assign_to;
+        $ticket->escalation_time_start = now();
          $ticket->current_level   = 1;
         // $ticket->current_level = $ticket->current_level - 1;
         $oppositeUser = User::find($ticket->assigned_to);
@@ -533,7 +505,7 @@ public function tickets_assign(Request $request)
         $me = Employee::where('user_id', auth()->id())->first();
         $subordinateUserIds = [];
         if ($me) {
-            $subs = $this->getAllSubordinates($me->employee_id); 
+            $subs = $this->getAllSubordinates($me->employee_id);
             $subordinateUserIds = collect($subs)->pluck('user_id')->toArray();
         }
 
@@ -635,7 +607,13 @@ public function tickets_assign(Request $request)
 
     public function comment_add(Request $request)
     {
-        $input = $request->all();
+        \App\Support\CommentContent::validate($request);
+        $request->validate(['ticket_id' => ['required', 'integer', 'exists:tickets,id']]);
+        $ticket = Ticket::findOrFail($request->input('ticket_id'));
+        abort_unless(in_array((int) auth()->id(), [(int) $ticket->requested_by, (int) $ticket->assigned_to], true), 403);
+        $input = $request->only('ticket_id', 'description');
+        $input['description'] = trim((string) ($input['description'] ?? ''));
+        $input['commenter'] = auth()->id();
         // dd($input);
         if ($request->hasFile('comment_attachment')) {
             $fileName = time() . '.' . $request->comment_attachment->getClientOriginalExtension();
@@ -643,10 +621,7 @@ public function tickets_assign(Request $request)
             $input['comment_attachment'] = $fileName;
         }
         if ($request->has('voice_note') && !empty($request->voice_note)) {
-            $audioFileName = time() . '.wav';
-            $audioData = base64_decode(preg_replace('/^data:audio\/\w+;base64,/', '', $request->voice_note));
-            file_put_contents(public_path('comment_attachment/audios/') . $audioFileName, $audioData);
-            $input['voice_note_path'] = $audioFileName;
+            $input['voice_note_path'] = \App\Support\CommentContent::saveAudio($request->voice_note);
         }
 
         Comment::create($input);
@@ -666,7 +641,7 @@ public function tickets_assign(Request $request)
         $comment = [
             'comment' => isset($input['description']) && !empty($input['description']) ? $input['description'] : null,
             'comment_attachment' => isset($input['comment_attachment']) && !empty($input['comment_attachment']) ? $input['comment_attachment'] : null,
-            'voice_note' => isset($input['voice_note']) && !empty($input['voice_note']) ? $input['voice_note'] : null,
+            'voice_note_path' => $input['voice_note_path'] ?? null,
         ];
 
         if ($ticket->requested_by == $commenterId) {
@@ -693,12 +668,14 @@ public function tickets_assign(Request $request)
 
     public function ticket_close(Request $request, $id)
     {
-        $input = $request->all();
-        $ticket = Ticket::find($id);
-
-        if (!$ticket) {
-            return redirect()->back()->with('error', 'Ticket not found.');
-        }
+        $ticket = Ticket::findOrFail($id);
+        abort_unless((int) auth()->id() === (int) $ticket->assigned_to || auth()->user()->can('admindashboard.index'), 403);
+        $request->merge(['description' => is_string($request->input('description')) ? trim($request->input('description')) : $request->input('description')]);
+        $request->validate([
+            'description' => ['required', 'string', 'max:10000'],
+            'comment_attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,txt,mp3,wav', 'max:5120'],
+        ], ['description.required' => 'Please enter a resolution before closing this ticket.']);
+        $input = ['ticket_id' => $ticket->id, 'commenter' => auth()->id(), 'description' => $request->input('description')];
         // Update the ticket status to Closed
         $ticket->status = "Closed";
 
@@ -790,5 +767,3 @@ public function tickets_assign(Request $request)
         return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 }
-
-

@@ -14,14 +14,12 @@ class RegionController extends Controller
     public function index(Request $request)
     {
         RolesPermissionController::can(['region.index']);
-        $perPage = $request->input('perpage', 10); // Default to 10 items per page if not specified
-        $data = [];
-        $data['regions'] = Region::with('parent')->paginate($perPage)->appends(['perpage' => $perPage]); // Paginate with 'parent' relation
-        $data['perPage'] = $perPage; // Current per-page value
-        return view('regions.index', $data);
+        $perPage = \App\Support\ListingFilters::perPage($request);
+        $regions = \App\Support\ListingFilters::paginate(Region::with('parent'), $request, ['name'], ['parent' => ['name']]);
+        return view('regions.index', compact('regions', 'perPage'));
     }
-    
-    
+
+
     /**
      * Show the form for creating a new resource.
      */
@@ -32,7 +30,7 @@ class RegionController extends Controller
         $data['regions'] = Region::get();
         return view('regions.create', $data);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
@@ -43,7 +41,7 @@ class RegionController extends Controller
         Region::create($input);
         return redirect()->route('regions.index')->with('success', 'Create successfully!');
     }
-    
+
     /**
      * Display the specified resource.
      */

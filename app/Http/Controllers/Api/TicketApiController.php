@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Region;
 use App\Models\Ticket;
+use App\Services\TicketCreationGuard;
+use App\Services\TicketHierarchy;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use App\Models\TicketType;
@@ -31,7 +34,8 @@ class TicketApiController extends Controller
     
         $paginator = Ticket::with([
             'tickettype:id,name',
-            'ticketSubType:id,name,priority',
+            'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
             'requestedby:id,name',
             'assignto:id,name',
         ])
@@ -71,7 +75,8 @@ class TicketApiController extends Controller
     
         $paginator = Ticket::with([
             'tickettype:id,name',
-            'ticketSubType:id,name,priority',
+            'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
             'requestedby:id,name',
             'assignto:id,name',
         ])
@@ -107,8 +112,9 @@ class TicketApiController extends Controller
     {
         // ---- Validate ----
         $validator = Validator::make($request->all(), [
-            'tickettype_id'     => ['required', 'exists:ticket_types,id'],
-            'ticketsubtype_id'  => ['nullable', 'exists:ticket_sub_types,id'],
+            'tickettype_id'     => ['required', 'integer', 'exists:ticket_types,id'],
+            'ticket_category_id' => ['nullable', 'integer', 'exists:ticket_categories,id'],
+            'ticketsubtype_id'  => ['required', 'integer', 'exists:ticket_sub_types,id'],
             'subject'           => ['nullable', 'string', 'max:255'],
             'description'       => ['nullable', 'string'],
             'ticket_attachment' => ['nullable', 'file', 'max:10240', 'mimes:jpg,jpeg,png,pdf,doc,docx'],
@@ -123,6 +129,13 @@ class TicketApiController extends Controller
         }
 
         $input = $validator->validated();
+        try {
+            $input = array_merge($input, app(TicketHierarchy::class)->resolve((int) $input['tickettype_id'], $input['ticket_category_id'] ?? null, $input['ticketsubtype_id']));
+        } catch (ValidationException $exception) {
+            return response()->json(['status' => false, 'message' => $exception->getMessage(), 'errors' => $exception->errors()], 422);
+        }
+        $creationGuard = app(TicketCreationGuard::class);
+        $creationGuard->assertCanCreate((int) $request->user()->id, $input['ticketsubtype_id'] ?? null);
 
         // ---- Attachment upload (optional) ----
         $attachmentUrl = null;
@@ -201,16 +214,8 @@ class TicketApiController extends Controller
         $input['current_level']         = 1;
         $input['escalation_time_start'] = Carbon::now();
 
-        // ---- Create ticket ----
-        $ticket = Ticket::create($input);
-
-        // ---- Timeline ----
-        TicketTimeline::create([
-            'ticket_id'   => $ticket->id,
-            'assign_to'   => $input['assigned_to'],
-            'assign_time' => now(),
-            'assign_type' => 'By Create',
-        ]);
+        // Atomically check for duplicates and save the ticket and timeline.
+        $ticket = $creationGuard->create($input);
 
         // ---- Notify assignee ----
         if ($assignee = User::find($input['assigned_to'])) {
@@ -223,7 +228,8 @@ class TicketApiController extends Controller
         // ---- Eager load + finalize URL ----
         $ticket->load([
             'tickettype:id,name',
-            'ticketSubType:id,name,priority',
+            'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
             'requestedby:id,name',
             'assignto:id,name',
         ]);
@@ -243,7 +249,8 @@ class TicketApiController extends Controller
     {
         $ticket = Ticket::with([
             'tickettype:id,name',
-            'ticketSubType:id,name,priority',
+            'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
             'requestedby:id,name',
             'assignto:id,name',
             'feedback',
@@ -345,6 +352,8 @@ class TicketApiController extends Controller
         // Validate minimum needed (expand as you like)
         $validator = Validator::make($request->all(), [
             'tickettype_id'     => 'required|integer|exists:ticket_types,id',
+            'ticket_category_id' => 'nullable|integer|exists:ticket_categories,id',
+            'ticketsubtype_id' => 'sometimes|required|integer|exists:ticket_sub_types,id',
             'ticket_attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:5120',
         ]);
 
@@ -355,7 +364,11 @@ class TicketApiController extends Controller
             ], 422);
         }
 
-        $input = $request->all();
+        try {
+            $input = array_merge($request->all(), app(TicketHierarchy::class)->resolve((int) $request->tickettype_id, $request->input('ticket_category_id'), $request->input('ticketsubtype_id', $ticket->ticketsubtype_id)));
+        } catch (ValidationException $exception) {
+            return response()->json(['status' => false, 'message' => $exception->getMessage(), 'errors' => $exception->errors()], 422);
+        }
 
         // ---- File upload (same path & field name as store) ----
         if ($request->hasFile('ticket_attachment')) {
@@ -435,7 +448,7 @@ class TicketApiController extends Controller
         $ticket->save();
 
         if ((int) $previousAssigned !== (int) $ticket->assigned_to) {
-            $this->ticket_time_line([
+            TicketTimeline::create([
                 'ticket_id'   => $ticket->id,
                 'assign_to'   => $ticket->assigned_to,
                 'assign_time' => date('Y-m-d H:i:s'),
@@ -482,6 +495,12 @@ class TicketApiController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
+        try {
+            \App\Support\CommentContent::validate($request);
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage(), 'errors' => $exception->errors()], 422);
+        }
+
         $ticket = Ticket::find($id);
         if (!$ticket) {
             return response()->json(['success' => false, 'message' => 'Ticket not found'], 404);
@@ -508,10 +527,7 @@ class TicketApiController extends Controller
 
         // ---- Handle base64 voice note (same approach as web) ----
         if ($request->filled('voice_note')) {
-            $audioFileName = time() . '.wav';
-            $audioData = base64_decode(preg_replace('/^data:audio\/\w+;base64,/', '', $request->voice_note));
-            file_put_contents(public_path('comment_attachment/audios/') . $audioFileName, $audioData);
-            $input['voice_note_path'] = $audioFileName;
+            $input['voice_note_path'] = \App\Support\CommentContent::saveAudio($request->voice_note);
         }
 
         // Create the comment (uses your existing columns)
@@ -534,7 +550,7 @@ class TicketApiController extends Controller
         $notifyPayload = [
             'comment' => $input['description'] ?? null,
             'comment_attachment' => $input['comment_attachment'] ?? null,
-            'voice_note' => $request->filled('voice_note') ? $request->voice_note : null,
+            'voice_note_path' => $input['voice_note_path'] ?? null,
         ];
 
         // Determine opposite party and notify
@@ -792,7 +808,8 @@ class TicketApiController extends Controller
         $tickets = (clone $base)
             ->with([
                 'tickettype:id,name',
-                'ticketSubType:id,name,priority',
+                'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
                 'requestedby:id,name',
                 'assignto:id,name',
             ])
@@ -890,7 +907,8 @@ class TicketApiController extends Controller
         $tickets = (clone $base)
                 ->with([
                     'tickettype:id,name',
-                    'ticketSubType:id,name,priority',
+                    'ticketSubType:id,name,priority,ticket_category_id',
+            'ticketCategory:id,name,code,ticket_type_id',
                     'requestedby:id,name',
                     'assignto:id,name',
                 ])
@@ -1328,6 +1346,7 @@ class TicketApiController extends Controller
         // perform reassignment, keep prev_assigned
         $ticket->prev_assigned = $ticket->assigned_to;
         $ticket->assigned_to   = $assignTo;
+        $ticket->escalation_time_start = now();
         $ticket->current_level   = 1;
         $ticket->save();
 

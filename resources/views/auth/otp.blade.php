@@ -162,17 +162,17 @@
                 });
                 console.log(response);
                 if (response.ok) {
-                    alert('OTP has been resent to your email.');
+                    await AppMessages.show({ type: 'success', message: 'OTP has been resent to your email.' });
                     // Reset timer and button
                     clearInterval(timerInterval);
                     document.getElementById('resendBtn').style.display = 'none';
                     startTimer();
                 } else {
-                    alert('Failed to resend OTP. Please try again.');
+                    await AppMessages.show({ type: 'error', message: 'Failed to resend OTP. Please try again.' });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while resending the OTP.');
+                await AppMessages.show({ type: 'error', message: 'An error occurred while resending the OTP.' });
             } finally {
                 // Reset button state
                 resendButton.textContent = 'Resend OTP';
@@ -201,18 +201,18 @@
 
                     if (response.ok) {
                         const data = await response.json();
-                        alert(data.message); // Show success message
+                        await AppMessages.show({ type: 'success', message: data.message }); // Show success message
                         window.location.href = data.redirect_url; // Redirect to the password reset page
                     } else {
                         const errorData = await response.json();
-                        alert(errorData.error); // Show error message
+                        await AppMessages.show({ type: 'error', message: errorData.error }); // Show error message
                     }
                 } else {
-                    alert('Please enter a valid 6-digit OTP.');
+                    await AppMessages.show({ type: 'error', message: 'Please enter a valid 6-digit OTP.' });
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('An error occurred while verifying the OTP.');
+                await AppMessages.show({ type: 'error', message: 'An error occurred while verifying the OTP.' });
             } finally {
                 // Reset button state
                 verifyButton.textContent = 'Verify OTP';
@@ -249,6 +249,7 @@
 
     </script>
 
+    @include('layouts.partials.message-modals')
 </body>
 
 </html>

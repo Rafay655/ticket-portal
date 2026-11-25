@@ -73,6 +73,8 @@
             <p><em>Note: For security reasons, please change your password immediately after logging in for the first time.</em></p>
          
         
+            @include('emails.partials.regional-poc')
+            @include('emails.partials.app-downloads')
             <p style="margin-top: 20px; font-weight:700;font-style: italic; font-size: 16px; color: #FF0000;">
                 *This is an automated message from Flexi Desk. Please do not reply to this email.
             </p>

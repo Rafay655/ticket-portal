@@ -2,11 +2,6 @@
     <h3 class="mb-4 text-start">Import Tickets</h3>
 
     <!-- Success Message -->
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <!-- Validation Errors -->
    

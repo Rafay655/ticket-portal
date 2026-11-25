@@ -5,12 +5,11 @@
 <script src="{{asset('assets/js/plugins/perfect-scrollbar.min.js')}}"></script>
 <script src="{{asset('assets/js/plugins/smooth-scrollbar.min.js')}}"></script>
 <script src="{{asset('assets/js/plugins/choices.min.js')}}"></script>
-<script src="{{asset('assets/js/plugins/sweetalert.min.js')}}"></script>
 <script src="{{asset('assets/js/core/spin.min.js')}}"></script>
 <script src="{{asset('assets/js/core/ladda.min.js')}}"></script>
-<script src="{{asset('assets/js/sweet_alerts.js?v2')}}"></script>
+@include('layouts.partials.message-modals')
 <script src="{{asset('assets/js/plugins/dropzone.min.js')}}"></script>
-<script src="{{asset('assets/js/validation.js?v9')}}"></script>
+<script src="{{asset('assets/js/validation.js?v10')}}"></script>
 
 
 <!-- Kanban scripts -->
@@ -45,6 +44,8 @@
   <script src="{{asset('assets/js/plugins/moment.min.js')}}"></script>
   <script src="{{asset('assets/js/datatable/datatables.min.js')}}"></script>
   <script src="{{asset('assets/js/datatable.js?v1')}}"></script>
+<script src="{{ asset('assets/js/listing-serials.js') }}?v=20261125"></script>
+<script src="{{ asset('assets/js/ticket-hierarchy.js') }}?v=20261125"></script>
 
 
  
@@ -106,10 +107,6 @@
        notificationDetaisl += '<br><a  class ="btn btn-sm btn-primary mt-2" href="'+$(this).attr('data-notification_url')+'">View</a>';
       $('div.notification_detail_body').empty().html(notificationDetaisl);
       fetchNotification()
-    });
-    $('body').on('hover','a#notification_toggle_view',function(e){
-      let notificationId = $(this).attr('data-notification_id');
-      alert('test');
     });
 
   
