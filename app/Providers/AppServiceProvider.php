@@ -15,9 +15,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
-        if (env(key: 'APP_ENV') !== 'local') {
-            URL::forceScheme(scheme: 'https');
+        // Herd can serve the local site over HTTPS even when APP_ENV=local.
+        // Keep generated form actions and redirects on the same scheme as the
+        // current request so the session/CSRF cookie is not split between HTTP
+        // and HTTPS.
+        if (
+            app()->environment('production')
+            || str_starts_with((string) env('APP_URL'), 'https://')
+            || (app()->bound('request') && request()->isSecure())
+        ) {
+            URL::forceScheme('https');
         }
     }
 

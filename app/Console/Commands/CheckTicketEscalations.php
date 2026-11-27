@@ -47,7 +47,12 @@ class CheckTicketEscalations extends Command
                         if (!$current || !$sla->shouldEscalate($current)) return null;
                         $next = $this->getNextAssignee((int) $current->assigned_to);
                         if (!$next) {
-                            Log::warning('No next reporting manager for overdue ticket.', ['ticket_id' => $current->id]);
+                            // A top-level assignee is a valid end of the escalation chain.
+                            // Leave the ticket with that assignee and avoid reporting it as a failure.
+                            Log::info('Ticket reached the top of the reporting hierarchy; no further escalation.', [
+                                'ticket_id' => $current->id,
+                                'assigned_to' => $current->assigned_to,
+                            ]);
                             return null;
                         }
                         $previous = $current->assigned_to;

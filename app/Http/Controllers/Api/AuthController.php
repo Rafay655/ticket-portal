@@ -134,7 +134,6 @@ class AuthController extends Controller
                 'fcm_token'   => ['nullable', 'string'],
                 'platform'    => ['nullable', 'in:android,ios,web'],
             ]);
-            Log::error('API change-password error', ['msg' => $request]);
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
@@ -555,7 +554,10 @@ class AuthController extends Controller
         ], 200);
 
     } catch (\Throwable $e) {
-        Log::error('API change-password error', ['msg' => $e->getMessage()]);
+        Log::error('API change-password error', [
+            'user_id' => $request->user()?->id,
+            'error' => $e->getMessage(),
+        ]);
         return response()->json([
             'success' => false,
             'message' => 'Something went wrong.',
